@@ -1,12 +1,16 @@
 <?php
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'dentist_booking');
+define('DB_USER', 'u186120816_tantawy');  // اسم المستخدم
+define('DB_PASS', '');  // ⚠️ ضع كلمة مرور قاعدة البيانات هنا
+define('DB_NAME', 'u186120816_tantawy');  // اسم قاعدة البيانات
 
-// Site Configuration
-define('SITE_URL', 'http://localhost/kero-dentist');
+// Site Configuration - Auto detect
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$base_path = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\');
+
+define('SITE_URL', $protocol . '://' . $host . $base_path);
 define('UPLOAD_PATH', __DIR__ . '/../public/uploads/');
 define('UPLOAD_URL', SITE_URL . '/public/uploads/');
 
@@ -23,6 +27,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Database Connection
+$conn = null;
 try {
     $conn = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
@@ -35,7 +40,9 @@ try {
         ]
     );
 } catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    // Log error and show friendly message
+    error_log("Database connection error: " . $e->getMessage());
+    die("خطأ في الاتصال بقاعدة البيانات. يرجى التأكد من:<br>1. إنشاء قاعدة البيانات (u186120816_tantawy)<br>2. استيراد ملف database.sql<br>3. التحقق من بيانات الاتصال في includes/config.php<br>4. وضع كلمة مرور قاعدة البيانات في DB_PASS<br><br>Error: " . $e->getMessage());
 }
 
 // Helper Functions
