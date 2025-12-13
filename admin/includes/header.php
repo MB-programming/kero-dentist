@@ -61,6 +61,12 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     </a>
                 </li>
                 <li>
+                    <a href="../users.php" class="<?php echo $current_page === 'users' ? 'active' : ''; ?>">
+                        <i class="fas fa-users"></i>
+                        <span>المستخدمين</span>
+                    </a>
+                </li>
+                <li>
                     <a href="../settings.php" class="<?php echo $current_page === 'settings' ? 'active' : ''; ?>">
                         <i class="fas fa-cog"></i>
                         <span>الإعدادات</span>

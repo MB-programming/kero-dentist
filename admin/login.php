@@ -7,29 +7,48 @@ if (isLoggedIn()) {
 }
 
 $error = '';
+$debug_info = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = sanitize($_POST['username'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($username) || empty($password)) {
         $error = 'الرجاء إدخال اسم المستخدم وكلمة المرور';
     } else {
         try {
-            $stmt = $conn->prepare("SELECT * FROM admin_users WHERE username = ?");
-            $stmt->execute([$username]);
-            $admin = $stmt->fetch();
-
-            if ($admin && password_verify($password, $admin['password'])) {
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['admin_username'] = $admin['username'];
-                $_SESSION['admin_email'] = $admin['email'];
-                redirect(SITE_URL . '/admin/index.php');
+            // Check database connection
+            if (!$conn) {
+                $error = 'خطأ في الاتصال بقاعدة البيانات';
             } else {
-                $error = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                $stmt = $conn->prepare("SELECT * FROM admin_users WHERE username = ?");
+                $stmt->execute([$username]);
+                $admin = $stmt->fetch();
+
+                if (!$admin) {
+                    $error = 'اسم المستخدم غير موجود';
+                    // Debug: Show available usernames
+                    $stmt = $conn->query("SELECT username FROM admin_users");
+                    $users = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    $debug_info = 'المستخدمين المتاحين: ' . implode(', ', $users);
+                } elseif (!password_verify($password, $admin['password'])) {
+                    $error = 'كلمة المرور غير صحيحة';
+                    // Debug info
+                    $debug_info = 'جرب: admin123 للمستخدم admin';
+                } else {
+                    // Success - login
+                    $_SESSION['admin_id'] = $admin['id'];
+                    $_SESSION['admin_username'] = $admin['username'];
+                    $_SESSION['admin_email'] = $admin['email'];
+
+                    // Redirect to admin panel
+                    header("Location: " . SITE_URL . "/admin/index.php");
+                    exit();
+                }
             }
         } catch(PDOException $e) {
-            $error = 'حدث خطأ أثناء تسجيل الدخول';
+            $error = 'حدث خطأ في قاعدة البيانات';
+            $debug_info = $e->getMessage();
         }
     }
 }
@@ -56,6 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-circle"></i>
                 <?php echo htmlspecialchars($error); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($debug_info): ?>
+            <div class="alert alert-info" style="background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;">
+                <i class="fas fa-info-circle"></i>
+                <?php echo htmlspecialchars($debug_info); ?>
             </div>
             <?php endif; ?>
 
