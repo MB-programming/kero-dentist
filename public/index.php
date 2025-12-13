@@ -53,9 +53,9 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#home">الرئيسية</a></li>
                 <li><a href="#about">عن الدكتور</a></li>
-                <li><a href="#services">الخدمات</a></li>
-                <li><a href="#packages">الباقات</a></li>
-                <li><a href="#blog">المقالات</a></li>
+                <li><a href="services.php">الخدمات</a></li>
+                <li><a href="packages.php">الباقات</a></li>
+                <li><a href="blog.php">المقالات</a></li>
                 <li><a href="#reviews">آراء العملاء</a></li>
                 <li><a href="#booking" class="btn-nav">احجز الآن</a></li>
             </ul>
