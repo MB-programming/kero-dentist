@@ -1,9 +1,9 @@
 <?php
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'u186120816_tantawy');  // اسم المستخدم
-define('DB_PASS', '');  // ⚠️ ضع كلمة مرور قاعدة البيانات هنا
-define('DB_NAME', 'u186120816_tantawy');  // اسم قاعدة البيانات
+define('DB_USER', 'u186120816_tantawy');
+define('DB_PASS', '54AC>TU/t');
+define('DB_NAME', 'u186120816_tantawy');
 
 // Site Configuration - Auto detect
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
