@@ -105,7 +105,8 @@ $bookings = $stmt->fetchAll();
             <select name="status" style="padding: 10px; border: 2px solid var(--border-color); border-radius: 6px;">
                 <option value="">جميع الحالات</option>
                 <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>قيد الانتظار</option>
-                <option value="confirmed" <?php echo $status_filter === 'confirmed' ? 'selected' : ''; ?>>مؤكد</option>
+                <option value="approved" <?php echo $status_filter === 'approved' ? 'selected' : ''; ?>>موافق عليه</option>
+                <option value="rejected" <?php echo $status_filter === 'rejected' ? 'selected' : ''; ?>>مرفوض</option>
                 <option value="completed" <?php echo $status_filter === 'completed' ? 'selected' : ''; ?>>مكتمل</option>
                 <option value="cancelled" <?php echo $status_filter === 'cancelled' ? 'selected' : ''; ?>>ملغي</option>
             </select>
@@ -120,6 +121,20 @@ $bookings = $stmt->fetchAll();
             </a>
             <?php endif; ?>
         </form>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="card">
+    <div class="card-body">
+        <div style="display: flex; gap: 10px;">
+            <a href="../api/export-bookings.php?format=excel" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> تصدير Excel
+            </a>
+            <a href="../api/export-bookings.php?format=word" class="btn btn-primary">
+                <i class="fas fa-file-word"></i> تصدير Word
+            </a>
+        </div>
     </div>
 </div>
 
@@ -163,15 +178,17 @@ $bookings = $stmt->fetchAll();
                             <?php
                             $status_badges = [
                                 'pending' => 'warning',
-                                'confirmed' => 'success',
-                                'cancelled' => 'danger',
-                                'completed' => 'info'
+                                'approved' => 'success',
+                                'rejected' => 'danger',
+                                'completed' => 'info',
+                                'cancelled' => 'secondary'
                             ];
                             $status_labels = [
                                 'pending' => 'قيد الانتظار',
-                                'confirmed' => 'مؤكد',
-                                'cancelled' => 'ملغي',
-                                'completed' => 'مكتمل'
+                                'approved' => 'موافق عليه',
+                                'rejected' => 'مرفوض',
+                                'completed' => 'مكتمل',
+                                'cancelled' => 'ملغي'
                             ];
                             $badge_class = $status_badges[$booking['status']] ?? 'primary';
                             $status_label = $status_labels[$booking['status']] ?? $booking['status'];
@@ -181,17 +198,25 @@ $bookings = $stmt->fetchAll();
                             </span>
                         </td>
                         <td>
-                            <div style="display: flex; gap: 5px;">
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <?php if ($booking['status'] === 'pending'): ?>
+                                <button onclick="quickApprove(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-success" title="موافقة سريعة">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button onclick="quickReject(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-danger" title="رفض سريع">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <?php endif; ?>
                                 <button onclick="viewBooking(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-primary" title="عرض التفاصيل">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button onclick="sendWhatsApp(<?php echo $booking['id']; ?>, '<?php echo htmlspecialchars($booking['client_whatsapp']); ?>', '<?php echo htmlspecialchars($booking['client_name']); ?>', '<?php echo formatDate($booking['booking_date']); ?>', '<?php echo htmlspecialchars($booking['booking_day']); ?>', '<?php echo number_format($booking['price'], 0); ?>')" class="btn btn-sm btn-success" title="إرسال واتساب">
+                                <button onclick="openWhatsAppModal('<?php echo htmlspecialchars($booking['client_whatsapp']); ?>', '<?php echo htmlspecialchars($booking['client_name']); ?>', <?php echo $booking['id']; ?>)" class="btn btn-sm btn-success" title="إرسال واتساب">
                                     <i class="fab fa-whatsapp"></i>
                                 </button>
                                 <button onclick="updateStatus(<?php echo $booking['id']; ?>, '<?php echo $booking['status']; ?>')" class="btn btn-sm btn-warning" title="تحديث الحالة">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="deleteBooking(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-danger" title="حذف">
+                                <button onclick="deleteBooking(<?php echo $booking['id']; ?>)" class="btn btn-sm" style="background: var(--danger); color: white;" title="حذف">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -258,7 +283,8 @@ $bookings = $stmt->fetchAll();
                     <label>الحالة</label>
                     <select name="status" id="status_select" class="form-control">
                         <option value="pending">قيد الانتظار</option>
-                        <option value="confirmed">مؤكد</option>
+                        <option value="approved">موافق عليه</option>
+                        <option value="rejected">مرفوض</option>
                         <option value="completed">مكتمل</option>
                         <option value="cancelled">ملغي</option>
                     </select>
@@ -270,6 +296,82 @@ $bookings = $stmt->fetchAll();
         </div>
     </div>
 </div>
+
+<!-- WhatsApp Message Modal -->
+<div id="whatsappModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fab fa-whatsapp"></i> إرسال رسالة واتساب</h3>
+            <button class="modal-close" onclick="closeModal('whatsappModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>الرسالة</label>
+                <textarea id="whatsapp_message" rows="8" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 6px; font-family: Arial; direction: rtl;"></textarea>
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">قم بتعديل الرسالة كما تريد</small>
+            </div>
+            <button onclick="sendWhatsAppMessage()" class="btn btn-success btn-block">
+                <i class="fab fa-whatsapp"></i> إرسال عبر واتساب
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentWhatsAppNumber = '';
+let currentBookingId = 0;
+
+function openWhatsAppModal(whatsapp, clientName, bookingId) {
+    currentWhatsAppNumber = whatsapp;
+    currentBookingId = bookingId;
+
+    const message = `مرحباً ${clientName}،\n\nنود التواصل معك بخصوص حجزك لدينا.\n\nمع تحياتنا،\n${<?php echo json_encode(getSetting('site_name', 'Dr. Ahmed Clinic')); ?>}`;
+
+    document.getElementById('whatsapp_message').value = message;
+    openModal('whatsappModal');
+}
+
+function sendWhatsAppMessage() {
+    const message = document.getElementById('whatsapp_message').value;
+    const cleanNumber = currentWhatsAppNumber.replace(/[^0-9]/g, '');
+    const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
+    // Mark as sent via API
+    fetch('../api/mark-whatsapp-sent.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({booking_id: currentBookingId})
+    });
+
+    window.open(url, '_blank');
+    closeModal('whatsappModal');
+}
+
+function quickApprove(id) {
+    if (confirm('هل أنت متأكد من الموافقة على هذا الحجز؟')) {
+        updateBookingStatus(id, 'approved');
+    }
+}
+
+function quickReject(id) {
+    if (confirm('هل أنت متأكد من رفض هذا الحجز؟')) {
+        updateBookingStatus(id, 'rejected');
+    }
+}
+
+function updateBookingStatus(id, status) {
+    const formData = new FormData();
+    formData.append('booking_id', id);
+    formData.append('status', status);
+    formData.append('update_status', '1');
+
+    fetch('bookings.php', {
+        method: 'POST',
+        body: formData
+    }).then(() => {
+        location.reload();
+    });
+}
 
 <script>
 function viewBooking(id) {
@@ -309,21 +411,6 @@ function deleteBooking(id) {
     if (confirm('هل أنت متأكد من حذف هذا الحجز؟')) {
         window.location.href = 'bookings.php?delete=' + id;
     }
-}
-
-function sendWhatsApp(id, whatsapp, name, date, day, price) {
-    const message = `مرحباً ${name}،\n\nنؤكد لك حجزك في العيادة:\n\n📅 التاريخ: ${date} (${day})\n💰 التكلفة: ${price} جنيه\n\nنتطلع لرؤيتك!\n\nمع تحياتنا،\nعيادة الدكتور`;
-
-    const url = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-
-    // Mark as sent
-    fetch('../api/mark-whatsapp-sent.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({booking_id: id})
-    });
-
-    window.open(url, '_blank');
 }
 
 function openModal(id) {

@@ -37,6 +37,12 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     </a>
                 </li>
                 <li>
+                    <a href="../sliders.php" class="<?php echo $current_page === 'sliders' ? 'active' : ''; ?>">
+                        <i class="fas fa-images"></i>
+                        <span>السلايدر</span>
+                    </a>
+                </li>
+                <li>
                     <a href="../services.php" class="<?php echo $current_page === 'services' ? 'active' : ''; ?>">
                         <i class="fas fa-tooth"></i>
                         <span>الخدمات</span>
@@ -58,6 +64,18 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     <a href="../reviews.php" class="<?php echo $current_page === 'reviews' ? 'active' : ''; ?>">
                         <i class="fas fa-star"></i>
                         <span>التقييمات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../email-templates.php" class="<?php echo $current_page === 'email-templates' ? 'active' : ''; ?>">
+                        <i class="fas fa-envelope"></i>
+                        <span>قوالب البريد</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../menu.php" class="<?php echo $current_page === 'menu' ? 'active' : ''; ?>">
+                        <i class="fas fa-bars"></i>
+                        <span>القوائم</span>
                     </a>
                 </li>
                 <li>
