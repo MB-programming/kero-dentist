@@ -13,6 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Handle doctor image upload
+        if (isset($_FILES['doctor_image']) && $_FILES['doctor_image']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = uploadFile($_FILES['doctor_image'], 'doctor');
+            if ($upload_result['success']) {
+                updateSetting('doctor_image', $upload_result['path']);
+            }
+        }
+
+        // Handle about image upload
+        if (isset($_FILES['about_image']) && $_FILES['about_image']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = uploadFile($_FILES['about_image'], 'about');
+            if ($upload_result['success']) {
+                updateSetting('about_image', $upload_result['path']);
+            }
+        }
+
         // Handle other settings
         foreach ($_POST as $key => $value) {
             if ($key !== 'submit') {
@@ -121,6 +137,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label>نبذة عن الطبيب</label>
                 <textarea name="doctor_bio" rows="4"><?php echo htmlspecialchars(getSetting('doctor_bio')); ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>صورة الطبيب</label>
+                <input type="file" name="doctor_image" accept="image/*">
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    الحجم الموصى به: 400x400 بكسل
+                </small>
+                <?php
+                $doctor_image = getSetting('doctor_image');
+                if ($doctor_image): ?>
+                    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <p style="margin-bottom: 10px; color: var(--text-light);">الصورة الحالية:</p>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor_image); ?>"
+                             alt="Doctor Image" style="max-width: 200px; max-height: 200px; border-radius: 50%;">
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="form-row">
@@ -278,9 +311,150 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- External APIs -->
+    <div class="card">
+        <div class="card-header">
+            <h2>مفاتيح APIs الخارجية</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                أدخل مفاتيح APIs الخارجية للخدمات التي تستخدمها
+            </div>
+
+            <div class="form-group">
+                <label>TinyMCE API Key</label>
+                <input type="text" name="tinymce_api_key"
+                       value="<?php echo htmlspecialchars(getSetting('tinymce_api_key')); ?>"
+                       placeholder="أدخل مفتاح TinyMCE API">
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    احصل على المفتاح المجاني من: <a href="https://www.tiny.cloud/auth/signup/" target="_blank">tiny.cloud</a>
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Google Maps API Key</label>
+                <input type="text" name="google_maps_api_key"
+                       value="<?php echo htmlspecialchars(getSetting('google_maps_api_key')); ?>"
+                       placeholder="أدخل مفتاح Google Maps API">
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    احصل على المفتاح من: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>
+                </small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Google Analytics ID</label>
+                    <input type="text" name="google_analytics_id"
+                           value="<?php echo htmlspecialchars(getSetting('google_analytics_id')); ?>"
+                           placeholder="G-XXXXXXXXXX أو UA-XXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Facebook Pixel ID</label>
+                    <input type="text" name="facebook_pixel_id"
+                           value="<?php echo htmlspecialchars(getSetting('facebook_pixel_id')); ?>"
+                           placeholder="أدخل Facebook Pixel ID">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Us Page -->
+    <div class="card">
+        <div class="card-header">
+            <h2>صفحة من نحن</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>عنوان الصفحة</label>
+                <input type="text" name="about_title"
+                       value="<?php echo htmlspecialchars(getSetting('about_title', 'من نحن')); ?>"
+                       placeholder="من نحن">
+            </div>
+
+            <div class="form-group">
+                <label>محتوى الصفحة</label>
+                <textarea name="about_content" rows="8" class="tinymce-editor"><?php echo htmlspecialchars(getSetting('about_content')); ?></textarea>
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    يمكنك استخدام HTML لتنسيق النص
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>صورة الصفحة</label>
+                <input type="file" name="about_image" accept="image/*">
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    الحجم الموصى به: 1200x600 بكسل
+                </small>
+                <?php
+                $about_image = getSetting('about_image');
+                if ($about_image): ?>
+                    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <p style="margin-bottom: 10px; color: var(--text-light);">الصورة الحالية:</p>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($about_image); ?>"
+                             alt="About Image" style="max-width: 100%; max-height: 300px;">
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Us Page -->
+    <div class="card">
+        <div class="card-header">
+            <h2>صفحة تواصل معنا</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>عنوان الصفحة</label>
+                <input type="text" name="contact_title"
+                       value="<?php echo htmlspecialchars(getSetting('contact_title', 'تواصل معنا')); ?>"
+                       placeholder="تواصل معنا">
+            </div>
+
+            <div class="form-group">
+                <label>وصف قصير</label>
+                <textarea name="contact_description" rows="3"><?php echo htmlspecialchars(getSetting('contact_description', 'نسعد بتواصلكم معنا')); ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>كود Google Maps (Embed)</label>
+                <textarea name="contact_map_embed" rows="4" placeholder='<iframe src="https://www.google.com/maps/embed?..." ...></iframe>'><?php echo htmlspecialchars(getSetting('contact_map_embed')); ?></textarea>
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    انسخ كود الـ iframe من Google Maps لإظهار الموقع على الخريطة
+                </small>
+            </div>
+        </div>
+    </div>
+
     <button type="submit" name="submit" class="btn btn-primary btn-block" style="max-width: 300px; margin: 0 auto;">
         <i class="fas fa-save"></i> حفظ الإعدادات
     </button>
 </form>
+
+<!-- TinyMCE Integration -->
+<script src="https://cdn.tiny.cloud/1/<?php echo getSetting('tinymce_api_key', 'no-api-key-set'); ?>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const apiKey = '<?php echo getSetting('tinymce_api_key'); ?>';
+
+    if (apiKey) {
+        tinymce.init({
+            selector: 'textarea.tinymce-editor',
+            language: 'ar',
+            directionality: 'rtl',
+            height: 300,
+            menubar: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_style: 'body { font-family:Arial,sans-serif; font-size:14px; direction:rtl; text-align:right; }'
+        });
+    }
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

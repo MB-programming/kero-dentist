@@ -46,6 +46,9 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
     <meta name="description" content="<?php echo htmlspecialchars($doctor_bio); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Motion.js for smooth animations -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.7.0/dist/motion.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -510,6 +513,123 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
                     }, 100);
                 }
             }
+        }
+
+        // Motion.js Animations
+        if (typeof Motion !== 'undefined') {
+            const { inView, animate, timeline } = Motion;
+
+            // Animate section headers
+            inView('.section-header', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['translateY(30px)', 'translateY(0)']
+                    },
+                    { duration: 0.8, delay: 0.2 }
+                );
+            });
+
+            // Animate service cards
+            inView('.service-card', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['scale(0.9)', 'scale(1)']
+                    },
+                    { duration: 0.6, delay: 0.1 }
+                );
+            });
+
+            // Animate package cards with stagger
+            inView('.package-card', ({ target }) => {
+                const index = Array.from(document.querySelectorAll('.package-card')).indexOf(target);
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['translateY(50px)', 'translateY(0)']
+                    },
+                    { duration: 0.8, delay: index * 0.15 }
+                );
+            });
+
+            // Animate review cards
+            inView('.review-card', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['translateX(-30px)', 'translateX(0)']
+                    },
+                    { duration: 0.7, delay: 0.2 }
+                );
+            });
+
+            // Animate blog cards
+            inView('.blog-card', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['translateY(40px)', 'translateY(0)']
+                    },
+                    { duration: 0.8, delay: 0.2 }
+                );
+            });
+
+            // Animate booking form
+            inView('.booking-form', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['scale(0.95)', 'scale(1)']
+                    },
+                    { duration: 0.8, delay: 0.2 }
+                );
+            });
+
+            // Animate footer sections
+            inView('.footer-section', ({ target }) => {
+                animate(target,
+                    {
+                        opacity: [0, 1],
+                        transform: ['translateY(20px)', 'translateY(0)']
+                    },
+                    { duration: 0.6, delay: 0.15 }
+                );
+            });
+
+            // Hover animations for service cards
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    animate(card,
+                        { transform: 'translateY(-10px)' },
+                        { duration: 0.3 }
+                    );
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    animate(card,
+                        { transform: 'translateY(0)' },
+                        { duration: 0.3 }
+                    );
+                });
+            });
+
+            // Hover animations for package cards
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    animate(card,
+                        { transform: 'translateY(-8px) scale(1.02)' },
+                        { duration: 0.3 }
+                    );
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    animate(card,
+                        { transform: 'translateY(0) scale(1)' },
+                        { duration: 0.3 }
+                    );
+                });
+            });
         }
     });
     </script>

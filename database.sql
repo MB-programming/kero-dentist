@@ -182,7 +182,18 @@ INSERT INTO `settings` (`setting_key`, `setting_value`, `setting_type`) VALUES
 ('smtp_from_email', '', 'text'),
 ('smtp_from_name', '', 'text'),
 ('smtp_encryption', 'tls', 'text'),
-('enable_email_notifications', '0', 'boolean')
+('enable_email_notifications', '0', 'boolean'),
+('doctor_image', '', 'text'),
+('tinymce_api_key', '', 'text'),
+('google_maps_api_key', '', 'text'),
+('facebook_pixel_id', '', 'text'),
+('google_analytics_id', '', 'text'),
+('about_title', 'من نحن', 'text'),
+('about_content', '', 'textarea'),
+('about_image', '', 'text'),
+('contact_title', 'تواصل معنا', 'text'),
+('contact_description', 'نسعد بتواصلكم معنا', 'textarea'),
+('contact_map_embed', '', 'textarea')
 ON DUPLICATE KEY UPDATE `setting_key` = `setting_key`;
 
 -- Insert sample services
