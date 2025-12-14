@@ -253,23 +253,29 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
                             <input type="text" id="client_name" name="client_name" required>
                         </div>
                         <div class="form-group">
-                            <label for="client_phone">رقم الهاتف *</label>
-                            <input type="tel" id="client_phone" name="client_phone" required>
+                            <label for="client_email">البريد الإلكتروني</label>
+                            <input type="email" id="client_email" name="client_email" placeholder="example@email.com">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label for="client_phone">رقم الهاتف *</label>
+                            <input type="tel" id="client_phone" name="client_phone" required>
+                        </div>
+                        <div class="form-group">
                             <label for="client_whatsapp">رقم الواتساب *</label>
                             <input type="tel" id="client_whatsapp" name="client_whatsapp" required>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="booking_date">تاريخ الحجز *</label>
                             <input type="date" id="booking_date" name="booking_date" required min="<?php echo date('Y-m-d'); ?>">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="client_address">العنوان</label>
-                        <input type="text" id="client_address" name="client_address">
+                        <div class="form-group">
+                            <label for="client_address">العنوان</label>
+                            <input type="text" id="client_address" name="client_address">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="package_id">اختر الباقة *</label>

@@ -19,6 +19,7 @@ foreach ($required_fields as $field) {
 
 // Sanitize inputs
 $client_name = sanitize($_POST['client_name']);
+$client_email = isset($_POST['client_email']) ? sanitize($_POST['client_email']) : '';
 $client_phone = sanitize($_POST['client_phone']);
 $client_whatsapp = sanitize($_POST['client_whatsapp']);
 $client_address = isset($_POST['client_address']) ? sanitize($_POST['client_address']) : '';
@@ -60,13 +61,14 @@ try {
     // Insert booking
     $stmt = $conn->prepare("
         INSERT INTO bookings (
-            client_name, client_address, client_phone, client_whatsapp,
-            booking_date, booking_day, package_id, notes, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+            client_name, client_email, client_address, client_phone, client_whatsapp,
+            booking_date, booking_day, package_id, admin_notes, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
 
     $stmt->execute([
         $client_name,
+        $client_email,
         $client_address,
         $client_phone,
         $client_whatsapp,
