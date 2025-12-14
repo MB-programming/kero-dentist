@@ -1,6 +1,11 @@
 <?php
 require_once 'includes/config.php';
 
+// Fetch active sliders
+$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC");
+$stmt->execute();
+$sliders = $stmt->fetchAll();
+
 // Fetch active services
 $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
 $stmt->execute();
@@ -67,17 +72,75 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <h1 class="hero-title"><?php echo htmlspecialchars($hero_title); ?></h1>
-            <p class="hero-subtitle"><?php echo htmlspecialchars($hero_subtitle); ?></p>
-            <div class="hero-buttons">
-                <a href="#booking" class="btn btn-primary">احجز موعد</a>
-                <a href="#services" class="btn btn-outline">تعرف على خدماتنا</a>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <?php
+            $site_logo = getSetting('site_logo', '');
+            if ($site_logo):
+            ?>
+                <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="preloader-logo">
+            <?php else: ?>
+                <i class="fas fa-tooth preloader-icon"></i>
+            <?php endif; ?>
+            <div class="preloader-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Hero Slider Section -->
+    <section id="home" class="hero-slider">
+        <?php if (count($sliders) > 0): ?>
+        <div class="slider-container">
+            <?php foreach ($sliders as $index => $slider): ?>
+            <div class="slide <?php echo $index === 0 ? 'active' : ''; ?>" style="background-image: url('<?php echo UPLOAD_URL . htmlspecialchars($slider['image']); ?>');">
+                <div class="hero-overlay"></div>
+                <div class="container hero-content">
+                    <h1 class="hero-title" data-aos="fade-up"><?php echo htmlspecialchars($slider['title']); ?></h1>
+                    <?php if ($slider['subtitle']): ?>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100"><?php echo htmlspecialchars($slider['subtitle']); ?></p>
+                    <?php endif; ?>
+                    <?php if ($slider['button_text'] && $slider['button_link']): ?>
+                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="<?php echo htmlspecialchars($slider['button_link']); ?>" class="btn btn-primary">
+                            <?php echo htmlspecialchars($slider['button_text']); ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+
+            <?php if (count($sliders) > 1): ?>
+            <!-- Slider Controls -->
+            <button class="slider-control prev" onclick="changeSlide(-1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="slider-control next" onclick="changeSlide(1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <!-- Slider Dots -->
+            <div class="slider-dots">
+                <?php foreach ($sliders as $index => $slider): ?>
+                <span class="dot <?php echo $index === 0 ? 'active' : ''; ?>" onclick="setSlide(<?php echo $index; ?>)"></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php else: ?>
+        <!-- Fallback Hero if no sliders -->
+        <div class="hero">
+            <div class="hero-overlay"></div>
+            <div class="container hero-content">
+                <h1 class="hero-title"><?php echo htmlspecialchars($hero_title); ?></h1>
+                <p class="hero-subtitle"><?php echo htmlspecialchars($hero_subtitle); ?></p>
+                <div class="hero-buttons">
+                    <a href="#booking" class="btn btn-primary">احجز موعد</a>
+                    <a href="#services" class="btn btn-outline">تعرف على خدماتنا</a>
+                </div>
             </div>
         </div>
+        <?php endif; ?>
     </section>
 
     <!-- About Section -->
@@ -363,5 +426,92 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
     </footer>
 
     <script src="js/main.js"></script>
+    <script>
+    // Preloader
+    window.addEventListener('load', function() {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 300);
+            }, 800);
+        }
+    });
+
+    // Hero Slider
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = slides.length;
+    let slideInterval;
+
+    function showSlide(n) {
+        if (totalSlides === 0) return;
+
+        currentSlide = (n + totalSlides) % totalSlides;
+
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+
+        dots.forEach((dot, index) => {
+            dot.classList.remove('active');
+            if (index === currentSlide) {
+                dot.classList.add('active');
+            }
+        });
+    }
+
+    function changeSlide(direction) {
+        showSlide(currentSlide + direction);
+        resetSlideInterval();
+    }
+
+    function setSlide(n) {
+        showSlide(n);
+        resetSlideInterval();
+    }
+
+    function resetSlideInterval() {
+        if (slideInterval) {
+            clearInterval(slideInterval);
+        }
+        if (totalSlides > 1) {
+            slideInterval = setInterval(() => {
+                showSlide(currentSlide + 1);
+            }, 5000); // Auto-rotate every 5 seconds
+        }
+    }
+
+    // Start auto-rotation if there are multiple slides
+    if (totalSlides > 1) {
+        resetSlideInterval();
+    }
+
+    // Package Pre-selection from sessionStorage
+    document.addEventListener('DOMContentLoaded', function() {
+        const packageSelect = document.getElementById('package_id');
+        if (packageSelect && typeof(Storage) !== "undefined") {
+            const selectedPackage = sessionStorage.getItem('selectedPackage');
+            if (selectedPackage) {
+                packageSelect.value = selectedPackage;
+                sessionStorage.removeItem('selectedPackage');
+
+                // Scroll to booking form
+                const bookingSection = document.getElementById('booking');
+                if (bookingSection) {
+                    setTimeout(() => {
+                        bookingSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            }
+        }
+    });
+    </script>
 </body>
 </html>
