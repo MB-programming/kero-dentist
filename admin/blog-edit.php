@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <i class="fas fa-check-circle"></i>
     <?php echo htmlspecialchars($success_message); ?>
     <?php if ($post && $post['is_published']): ?>
-    <a href="../../public/blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" target="_blank" style="margin-right: 15px;">
+    <a href="../blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" target="_blank" style="margin-right: 15px;">
         <i class="fas fa-external-link-alt"></i> مشاهدة المقال
     </a>
     <?php endif; ?>

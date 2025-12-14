@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php';
+require_once 'includes/config.php';
 
 // Pagination
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;

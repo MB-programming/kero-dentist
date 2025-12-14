@@ -90,7 +90,7 @@ $posts = $stmt->fetchAll();
                         <td>
                             <div style="display: flex; gap: 5px;">
                                 <?php if ($post['is_published']): ?>
-                                <a href="../../public/blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" target="_blank" class="btn btn-sm btn-success" title="مشاهدة">
+                                <a href="../blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" target="_blank" class="btn btn-sm btn-success" title="مشاهدة">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <?php endif; ?>

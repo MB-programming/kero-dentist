@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php';
+require_once 'includes/config.php';
 
 // Fetch all active services
 $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");

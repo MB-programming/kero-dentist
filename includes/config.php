@@ -8,11 +8,11 @@ define('DB_NAME', 'u186120816_tantawy');
 // Site Configuration - Auto detect
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$base_path = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\');
+$base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
 define('SITE_URL', $protocol . '://' . $host . $base_path);
-define('UPLOAD_PATH', __DIR__ . '/../public/uploads/');
-define('UPLOAD_URL', SITE_URL . '/public/uploads/');
+define('UPLOAD_PATH', __DIR__ . '/../uploads/');
+define('UPLOAD_URL', SITE_URL . '/uploads/');
 
 // Timezone
 date_default_timezone_set('Africa/Cairo');

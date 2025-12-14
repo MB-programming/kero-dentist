@@ -75,7 +75,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             </ul>
 
             <div class="sidebar-footer">
-                <a href="../../public/index.php" target="_blank">
+                <a href="../index.php" target="_blank">
                     <i class="fas fa-external-link-alt"></i>
                     <span>مشاهدة الموقع</span>
                 </a>

@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php';
+require_once 'includes/config.php';
 
 // Get slug from URL
 $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : '';
@@ -157,19 +157,19 @@ $meta_keywords = $post['meta_keywords'];
             <div style="margin-top: 50px; padding: 30px; background: var(--bg-light); border-radius: 10px; text-align: center;">
                 <h3 style="margin-bottom: 20px; color: var(--text-color);">شارك المقال</h3>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(SITE_URL . '/public/blog-post.php?slug=' . $post['slug']); ?>"
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(SITE_URL . '/blog-post.php?slug=' . $post['slug']); ?>"
                        target="_blank"
                        class="btn btn-primary"
                        style="background: #1877f2;">
                         <i class="fab fa-facebook"></i> فيسبوك
                     </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode(SITE_URL . '/public/blog-post.php?slug=' . $post['slug']); ?>&text=<?php echo urlencode($post['title']); ?>"
+                    <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode(SITE_URL . '/blog-post.php?slug=' . $post['slug']); ?>&text=<?php echo urlencode($post['title']); ?>"
                        target="_blank"
                        class="btn btn-primary"
                        style="background: #1da1f2;">
                         <i class="fab fa-twitter"></i> تويتر
                     </a>
-                    <a href="https://wa.me/?text=<?php echo urlencode($post['title'] . ' - ' . SITE_URL . '/public/blog-post.php?slug=' . $post['slug']); ?>"
+                    <a href="https://wa.me/?text=<?php echo urlencode($post['title'] . ' - ' . SITE_URL . '/blog-post.php?slug=' . $post['slug']); ?>"
                        target="_blank"
                        class="btn btn-primary"
                        style="background: #25d366;">

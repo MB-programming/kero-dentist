@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <div class="login-footer">
-                <a href="../public/index.php">
+                <a href="../index.php">
                     <i class="fas fa-arrow-right"></i> العودة إلى الموقع
                 </a>
             </div>

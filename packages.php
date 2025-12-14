@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php';
+require_once 'includes/config.php';
 
 // Fetch all active packages
 $stmt = $conn->prepare("SELECT * FROM packages WHERE is_active = 1 ORDER BY display_order ASC");
