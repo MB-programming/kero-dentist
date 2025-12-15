@@ -26,6 +26,9 @@ $admin_initial = mb_substr($admin_username, 0, 1);
 
     <!-- Facebook-Style Admin CSS -->
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin-facebook.css">
+
+    <!-- Admin Pages Custom CSS -->
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin-pages.css">
 </head>
 <body>
     <div class="fb-dashboard">
