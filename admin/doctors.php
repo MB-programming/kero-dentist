@@ -1,6 +1,6 @@
 <?php
 $page_title = 'إدارة الدكاترة';
-include 'includes/header-facebook.php';
+include 'includes/header.php';
 
 // Handle delete
 if (isset($_GET['delete'])) {

@@ -1,6 +1,6 @@
 <?php
 $page_title = 'لوحة التحكم - الرئيسية';
-include 'includes/header-facebook.php';
+include 'includes/header.php';
 
 // Get comprehensive stats
 $stmt = $conn->query("SELECT COUNT(*) FROM bookings");
