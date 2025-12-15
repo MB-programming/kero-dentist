@@ -367,10 +367,11 @@
         <div class="container">
             <div class="doctor-hero-content">
                 <div class="doctor-image-wrapper">
-                    <?php if ($doctor_image): ?>
+                    <?php if ($doctor_image && file_exists(UPLOAD_PATH . $doctor_image)): ?>
                         <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor_image); ?>"
                              alt="<?php echo htmlspecialchars($doctor_name); ?>"
-                             class="doctor-main-image">
+                             class="doctor-main-image"
+                             onerror="this.parentElement.innerHTML='<div class=\'doctor-main-image\' style=\'background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; aspect-ratio: 3/4;\'><i class=\'fas fa-user-md\' style=\'font-size: 8rem; color: rgba(255,255,255,0.3);\'></i></div>'">
                     <?php else: ?>
                         <div class="doctor-main-image" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; aspect-ratio: 3/4;">
                             <i class="fas fa-user-md" style="font-size: 8rem; color: rgba(255,255,255,0.3);"></i>

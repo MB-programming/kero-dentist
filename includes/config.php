@@ -95,9 +95,14 @@ function getSetting($key, $default = '') {
 function updateSetting($key, $value) {
     global $conn;
     try {
-        $stmt = $conn->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
-        return $stmt->execute([$value, $key]);
+        $stmt = $conn->prepare("
+            INSERT INTO settings (setting_key, setting_value, setting_type)
+            VALUES (?, ?, 'text')
+            ON DUPLICATE KEY UPDATE setting_value = ?
+        ");
+        return $stmt->execute([$key, $value, $value]);
     } catch(PDOException $e) {
+        error_log("updateSetting error: " . $e->getMessage());
         return false;
     }
 }

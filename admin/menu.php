@@ -5,27 +5,27 @@ requireLogin();
 // Handle add/edit menu item
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_menu_item'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    $menu_location = sanitize($_POST['menu_location']);
+    $position = sanitize($_POST['position']);
     $title = sanitize($_POST['title']);
     $url = sanitize($_POST['url']);
     $display_order = intval($_POST['display_order']);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
-    $parent_id = !empty($_POST['parent_id']) ? intval($_POST['parent_id']) : null;
+    $target = isset($_POST['target']) ? sanitize($_POST['target']) : '_self';
 
     try {
         if ($id > 0) {
             // Update existing menu item
-            $stmt = $conn->prepare("UPDATE menu_items SET menu_location = ?, title = ?, url = ?, display_order = ?, is_active = ?, parent_id = ? WHERE id = ?");
-            $stmt->execute([$menu_location, $title, $url, $display_order, $is_active, $parent_id, $id]);
+            $stmt = $conn->prepare("UPDATE menu_items SET position = ?, title = ?, url = ?, display_order = ?, is_active = ?, target = ? WHERE id = ?");
+            $stmt->execute([$position, $title, $url, $display_order, $is_active, $target, $id]);
             $success_message = 'تم تحديث عنصر القائمة بنجاح';
         } else {
             // Add new menu item
-            $stmt = $conn->prepare("INSERT INTO menu_items (menu_location, title, url, display_order, is_active, parent_id) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$menu_location, $title, $url, $display_order, $is_active, $parent_id]);
+            $stmt = $conn->prepare("INSERT INTO menu_items (position, title, url, display_order, is_active, target) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$position, $title, $url, $display_order, $is_active, $target]);
             $success_message = 'تم إضافة عنصر القائمة بنجاح';
         }
     } catch(PDOException $e) {
-        $error_message = 'حدث خطأ أثناء حفظ عنصر القائمة';
+        $error_message = 'حدث خطأ أثناء حفظ عنصر القائمة: ' . $e->getMessage();
     }
 }
 
@@ -33,11 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_menu_item'])) {
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     try {
-        // Delete children first
-        $stmt = $conn->prepare("DELETE FROM menu_items WHERE parent_id = ?");
-        $stmt->execute([$id]);
-
-        // Delete parent
         $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ?");
         $stmt->execute([$id]);
 
@@ -49,7 +44,7 @@ if (isset($_GET['delete'])) {
 }
 
 // Fetch all menu items
-$stmt = $conn->query("SELECT * FROM menu_items ORDER BY menu_location, display_order ASC");
+$stmt = $conn->query("SELECT * FROM menu_items ORDER BY position, display_order ASC");
 $menu_items = $stmt->fetchAll();
 
 // Group by location
@@ -59,11 +54,8 @@ $grouped_items = [
 ];
 
 foreach ($menu_items as $item) {
-    $grouped_items[$item['menu_location']][] = $item;
+    $grouped_items[$item['position']][] = $item;
 }
-
-// Get parent menu items for dropdown
-$parent_items = $conn->query("SELECT id, title, menu_location FROM menu_items WHERE parent_id IS NULL ORDER BY menu_location, display_order")->fetchAll();
 
 // Get menu item for editing
 $edit_item = null;
@@ -133,10 +125,10 @@ include 'includes/header.php';
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="menu_location">موقع القائمة *</label>
-                    <select id="menu_location" name="menu_location" required>
-                        <option value="header" <?php echo ($edit_item && $edit_item['menu_location'] === 'header') ? 'selected' : ''; ?>>Header (القائمة العلوية)</option>
-                        <option value="footer" <?php echo ($edit_item && $edit_item['menu_location'] === 'footer') ? 'selected' : ''; ?>>Footer (القائمة السفلية)</option>
+                    <label for="position">موقع القائمة *</label>
+                    <select id="position" name="position" required>
+                        <option value="header" <?php echo ($edit_item && $edit_item['position'] === 'header') ? 'selected' : ''; ?>>Header (القائمة العلوية)</option>
+                        <option value="footer" <?php echo ($edit_item && $edit_item['position'] === 'footer') ? 'selected' : ''; ?>>Footer (القائمة السفلية)</option>
                     </select>
                 </div>
 
@@ -149,19 +141,11 @@ include 'includes/header.php';
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="parent_id">عنصر أب (للقوائم المنسدلة - اختياري)</label>
-                    <select id="parent_id" name="parent_id">
-                        <option value="">بدون (عنصر رئيسي)</option>
-                        <?php foreach ($parent_items as $parent): ?>
-                        <option value="<?php echo $parent['id']; ?>"
-                                <?php echo ($edit_item && $edit_item['parent_id'] == $parent['id']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($parent['title']); ?> (<?php echo $parent['menu_location']; ?>)
-                        </option>
-                        <?php endforeach; ?>
+                    <label for="target">فتح الرابط في</label>
+                    <select id="target" name="target">
+                        <option value="_self" <?php echo ($edit_item && $edit_item['target'] === '_self') ? 'selected' : ''; ?>>نفس الصفحة</option>
+                        <option value="_blank" <?php echo ($edit_item && $edit_item['target'] === '_blank') ? 'selected' : ''; ?>>صفحة جديدة</option>
                     </select>
-                    <small style="color: var(--text-light); display: block; margin-top: 5px;">
-                        اختر عنصر أب لإنشاء قائمة منسدلة
-                    </small>
                 </div>
 
                 <div class="form-group">

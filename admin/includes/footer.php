@@ -1,5 +1,10 @@
         </main>
     </div>
-    <script src="../js/admin.js"></script>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Admin JS -->
+    <script src="<?php echo ASSETS_URL; ?>/js/admin.js"></script>
 </body>
 </html>

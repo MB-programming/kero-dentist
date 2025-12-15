@@ -9,9 +9,23 @@
     --primary: #0d6efd;
     --sidebar-bg: #1a1d20;
     --sidebar-hover: #2c3034;
+    --bs-primary: #0d6efd;
+    --bs-primary-dark: #0a58ca;
+}
+
+/* Global Admin Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+}
+
+.dashboard {
+    display: flex;
+    min-height: 100vh;
 }
 
 /* Sidebar Styling */
+.sidebar,
 .admin-sidebar {
     position: fixed;
     right: 0;
@@ -23,6 +37,7 @@
     overflow-y: auto;
     z-index: 1040;
     transition: all 0.3s ease;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
 }
 
 .admin-sidebar::-webkit-scrollbar {
@@ -171,4 +186,212 @@
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-bottom: 2px solid #dee2e6;
     font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-right: var(--sidebar-width);
+    padding: 2rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-icon.primary {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+}
+
+.stat-icon.success {
+    background: linear-gradient(135deg, #198754, #157347);
+}
+
+.stat-icon.warning {
+    background: linear-gradient(135deg, #ffc107, #ffb300);
+}
+
+.stat-icon.danger {
+    background: linear-gradient(135deg, #dc3545, #b02a37);
+}
+
+.stat-info h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: #212529;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: auto;
+}
+
+.sidebar-footer a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-footer a:hover {
+    background: var(--sidebar-hover);
+    color: white;
+}
+
+.sidebar-footer a i {
+    margin-left: 0.75rem;
+    width: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table thead {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+table th {
+    padding: 1rem;
+    font-weight: 600;
+    text-align: right;
+    border-bottom: 2px solid #dee2e6;
+}
+
+table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .sidebar,
+    .admin-sidebar {
+        transform: translateX(100%);
+    }
+
+    .sidebar.show,
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content,
+    .admin-main {
+        margin-right: 0;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 }

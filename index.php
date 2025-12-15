@@ -55,8 +55,15 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
     <nav class="navbar" id="navbar">
         <div class="container">
             <div class="nav-brand">
-                <i class="fas fa-tooth"></i>
-                <span><?php echo htmlspecialchars($site_name); ?></span>
+                <?php
+                $site_logo = getSetting('site_logo', '');
+                if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)):
+                ?>
+                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" style="height: 50px; max-width: 180px; object-fit: contain;">
+                <?php else: ?>
+                    <i class="fas fa-tooth"></i>
+                    <span><?php echo htmlspecialchars($site_name); ?></span>
+                <?php endif; ?>
             </div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#home">الرئيسية</a></li>
