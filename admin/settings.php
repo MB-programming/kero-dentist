@@ -169,6 +169,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Doctor Statistics & Achievements -->
+    <div class="card">
+        <div class="card-header">
+            <h2>إحصائيات ومعلومات إضافية عن الدكتور</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                هذه المعلومات تظهر في صفحة "عن الدكتور"
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>سنوات الخبرة</label>
+                    <input type="number" name="doctor_years_experience"
+                           value="<?php echo htmlspecialchars(getSetting('doctor_years_experience', '15')); ?>"
+                           placeholder="15">
+                </div>
+                <div class="form-group">
+                    <label>عدد المرضى</label>
+                    <input type="number" name="doctor_total_patients"
+                           value="<?php echo htmlspecialchars(getSetting('doctor_total_patients', '5000')); ?>"
+                           placeholder="5000">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>عدد الحالات الناجحة</label>
+                    <input type="number" name="doctor_success_cases"
+                           value="<?php echo htmlspecialchars(getSetting('doctor_success_cases', '3500')); ?>"
+                           placeholder="3500">
+                </div>
+                <div class="form-group">
+                    <label>نسبة رضا العملاء (%)</label>
+                    <input type="number" name="doctor_satisfaction_rate"
+                           value="<?php echo htmlspecialchars(getSetting('doctor_satisfaction_rate', '98')); ?>"
+                           placeholder="98">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>نبذة كاملة عن الدكتور (للصفحة المخصصة)</label>
+                <textarea name="doctor_about_full" rows="6" class="tinymce-editor"><?php echo htmlspecialchars(getSetting('doctor_about_full', 'طبيب أسنان متخصص مع خبرة واسعة في جميع مجالات طب وجراحة الفم والأسنان. حاصل على شهادات دولية ومعتمد من أفضل الجامعات العالمية. يؤمن بأن الابتسامة الجميلة هي مفتاح الثقة بالنفس.')); ?></textarea>
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    هذا النص يظهر في صفحة "عن الدكتور" المخصصة
+                </small>
+            </div>
+        </div>
+    </div>
+
     <!-- WhatsApp API Settings -->
     <div class="card">
         <div class="card-header">
