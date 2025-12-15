@@ -160,10 +160,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group">
                     <label>عنوان الصفحة الرئيسية</label>
                     <input type="text" name="hero_title" value="<?php echo htmlspecialchars(getSetting('hero_title')); ?>">
+                    <small style="color: #6b7280;">مثال: ابتسامتك المثالية تبدأ هنا</small>
                 </div>
                 <div class="form-group">
                     <label>العنوان الفرعي</label>
                     <input type="text" name="hero_subtitle" value="<?php echo htmlspecialchars(getSetting('hero_subtitle')); ?>">
+                    <small style="color: #6b7280;">مثال: رعاية أسنان احترافية مع أحدث التقنيات</small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نص زر الحجز الرئيسي</label>
+                    <input type="text" name="hero_btn_primary" value="<?php echo htmlspecialchars(getSetting('hero_btn_primary', 'احجز موعدك الآن')); ?>">
+                    <small style="color: #6b7280;">النص الذي يظهر على الزر الأساسي</small>
+                </div>
+                <div class="form-group">
+                    <label>نص زر اعرف المزيد</label>
+                    <input type="text" name="hero_btn_secondary" value="<?php echo htmlspecialchars(getSetting('hero_btn_secondary', 'اعرف المزيد')); ?>">
+                    <small style="color: #6b7280;">النص الذي يظهر على الزر الثانوي</small>
                 </div>
             </div>
         </div>

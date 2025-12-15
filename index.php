@@ -34,6 +34,8 @@ $doctor_title = getSetting('doctor_title', 'استشاري طب وجراحة ا�
 $doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً');
 $hero_title = getSetting('hero_title', 'ابتسامتك المثالية تبدأ هنا');
 $hero_subtitle = getSetting('hero_subtitle', 'رعاية أسنان احترافية مع أحدث التقنيات');
+$hero_btn_primary = getSetting('hero_btn_primary', 'احجز موعدك الآن');
+$hero_btn_secondary = getSetting('hero_btn_secondary', 'اعرف المزيد');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
 $site_address = getSetting('site_address', 'القاهرة، مصر');
@@ -105,11 +107,11 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
                     <div class="modern-hero-buttons">
                         <a href="#booking" class="modern-btn modern-btn-primary">
                             <i class="fas fa-calendar-check"></i>
-                            احجز موعدك الآن
+                            <?php echo htmlspecialchars($hero_btn_primary); ?>
                         </a>
                         <a href="#services" class="modern-btn modern-btn-secondary">
                             <i class="fas fa-info-circle"></i>
-                            اعرف المزيد
+                            <?php echo htmlspecialchars($hero_btn_secondary); ?>
                         </a>
                     </div>
                 </div>
