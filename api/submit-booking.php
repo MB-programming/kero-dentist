@@ -62,11 +62,11 @@ try {
     $stmt = $conn->prepare("
         INSERT INTO bookings (
             client_name, client_email, client_address, client_phone, client_whatsapp,
-            booking_date, booking_day, package_id, admin_notes, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+            booking_date, booking_day, package_id, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
 
-    $stmt->execute([
+    $result = $stmt->execute([
         $client_name,
         $client_email,
         $client_address,
@@ -74,19 +74,29 @@ try {
         $client_whatsapp,
         $booking_date,
         $booking_day,
-        $package_id,
-        $notes
+        $package_id
     ]);
+
+    if (!$result) {
+        throw new Exception('Failed to insert booking');
+    }
 
     $booking_id = $conn->lastInsertId();
 
     echo json_encode([
         'success' => true,
-        'message' => 'تم إرسال حجزك بنجاح',
+        'message' => 'تم إرسال حجزك بنجاح! سنتواصل معك قريباً.',
         'booking_id' => $booking_id
     ]);
 
 } catch(PDOException $e) {
+    error_log("Booking error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'message' => 'حدث خطأ أثناء حفظ الحجز. يرجى المحاولة مرة أخرى.',
+        'error' => $e->getMessage()
+    ]);
+} catch(Exception $e) {
     error_log("Booking error: " . $e->getMessage());
     echo json_encode([
         'success' => false,

@@ -193,7 +193,11 @@ INSERT INTO `settings` (`setting_key`, `setting_value`, `setting_type`) VALUES
 ('about_image', '', 'text'),
 ('contact_title', 'تواصل معنا', 'text'),
 ('contact_description', 'نسعد بتواصلكم معنا', 'textarea'),
-('contact_map_embed', '', 'textarea')
+('contact_map_embed', '', 'textarea'),
+('doctor_years_experience', '15', 'text'),
+('doctor_total_patients', '5000', 'text'),
+('doctor_success_cases', '3500', 'text'),
+('doctor_about_full', 'طبيب أسنان متخصص مع خبرة واسعة في جميع مجالات طب وجراحة الفم والأسنان', 'textarea')
 ON DUPLICATE KEY UPDATE `setting_key` = `setting_key`;
 
 -- Insert sample services
