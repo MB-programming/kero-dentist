@@ -131,11 +131,6 @@ $admin_initial = mb_substr($admin_username, 0, 1);
                     <span>المكتبة</span>
                 </a>
 
-                <a href="email-templates.php" class="fb-menu-item <?php echo $current_page === 'email-templates' ? 'active' : ''; ?>">
-                    <i class="fas fa-envelope"></i>
-                    <span>قوالب البريد</span>
-                </a>
-
                 <a href="users.php" class="fb-menu-item <?php echo $current_page === 'users' ? 'active' : ''; ?>">
                     <i class="fas fa-users"></i>
                     <span>المستخدمين</span>

@@ -179,7 +179,14 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
                     <?php endif; ?>
                     <div class="modern-service-content">
                         <h3 class="modern-service-title"><?php echo htmlspecialchars($service['title']); ?></h3>
-                        <p class="modern-service-description"><?php echo htmlspecialchars($service['short_description']); ?></p>
+                        <p class="modern-service-description">
+                            <?php
+                            $desc = isset($service['short_description']) && !empty($service['short_description'])
+                                    ? $service['short_description']
+                                    : $service['description'];
+                            echo htmlspecialchars($desc);
+                            ?>
+                        </p>
                         <a href="service-details.php?id=<?php echo $service['id']; ?>" class="modern-service-link">
                             اعرف المزيد
                             <i class="fas fa-arrow-left"></i>
@@ -311,7 +318,14 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
                     <?php endif; ?>
                     <div class="modern-service-content">
                         <h3 class="modern-service-title"><?php echo htmlspecialchars($package['name']); ?></h3>
-                        <p class="modern-service-description"><?php echo htmlspecialchars($package['short_description']); ?></p>
+                        <p class="modern-service-description">
+                            <?php
+                            $desc = isset($package['short_description']) && !empty($package['short_description'])
+                                    ? $package['short_description']
+                                    : $package['description'];
+                            echo htmlspecialchars($desc);
+                            ?>
+                        </p>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                             <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">
                                 <?php echo number_format($package['price']); ?> جنيه

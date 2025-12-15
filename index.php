@@ -2,9 +2,9 @@
 require_once 'includes/config.php';
 
 // Fetch active sliders
-$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC");
+$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC LIMIT 1");
 $stmt->execute();
-$sliders = $stmt->fetchAll();
+$hero_slider = $stmt->fetch();
 
 // Fetch active services
 $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
@@ -16,26 +16,22 @@ $stmt = $conn->prepare("SELECT * FROM packages WHERE is_active = 1 ORDER BY disp
 $stmt->execute();
 $packages = $stmt->fetchAll();
 
-// Fetch published blog posts (latest 3)
-$stmt = $conn->prepare("SELECT * FROM blog_posts WHERE is_published = 1 ORDER BY published_at DESC LIMIT 3");
-$stmt->execute();
-$blog_posts = $stmt->fetchAll();
-
 // Fetch approved reviews
-$stmt = $conn->prepare("SELECT * FROM reviews WHERE is_approved = 1 AND is_displayed = 1 ORDER BY created_at DESC LIMIT 6");
+$stmt = $conn->prepare("SELECT * FROM reviews WHERE is_approved = 1 AND is_displayed = 1 ORDER BY created_at DESC LIMIT 3");
 $stmt->execute();
 $reviews = $stmt->fetchAll();
 
 // Get site settings
-$site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
-$doctor_name = getSetting('doctor_name', 'Dr. Ahmed Mohamed');
-$doctor_title = getSetting('doctor_title', 'Dental Specialist');
-$doctor_bio = getSetting('doctor_bio', 'Experienced dental specialist');
-$hero_title = getSetting('hero_title', 'Your Smile, Our Priority');
-$hero_subtitle = getSetting('hero_subtitle', 'Professional dental care');
+$site_name = getSetting('site_name', 'عيادة الدكتور');
+$site_logo = getSetting('site_logo', '');
+$doctor_name = getSetting('doctor_name', 'د. أحمد محمد');
+$doctor_title = getSetting('doctor_title', 'استشاري طب وجراحة الفم والأسنان');
+$doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً');
+$hero_title = getSetting('hero_title', 'ابتسامتك المثالية تبدأ هنا');
+$hero_subtitle = getSetting('hero_subtitle', 'رعاية أسنان احترافية مع أحدث التقنيات');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
-$site_address = getSetting('site_address', 'Cairo, Egypt');
+$site_address = getSetting('site_address', 'القاهرة، مصر');
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -44,37 +40,43 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($site_name); ?> - <?php echo htmlspecialchars($doctor_title); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars($doctor_bio); ?>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
 
-    <!-- Motion.js for smooth animations -->
-    <script src="https://cdn.jsdelivr.net/npm/motion@11.7.0/dist/motion.min.js"></script>
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Modern CSS -->
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <!-- Modern Navbar -->
+    <nav class="modern-navbar">
         <div class="container">
-            <div class="nav-brand">
-                <?php
-                $site_logo = getSetting('site_logo', '');
-                if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)):
-                ?>
-                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" style="height: 50px; max-width: 180px; object-fit: contain;">
+            <a href="index.php" class="modern-logo">
+                <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
+                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
                 <?php else: ?>
                     <i class="fas fa-tooth"></i>
                     <span><?php echo htmlspecialchars($site_name); ?></span>
                 <?php endif; ?>
-            </div>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="#home">الرئيسية</a></li>
-                <li><a href="#about">عن الدكتور</a></li>
-                <li><a href="services.php">الخدمات</a></li>
-                <li><a href="packages.php">الباقات</a></li>
-                <li><a href="blog.php">المقالات</a></li>
-                <li><a href="#reviews">آراء العملاء</a></li>
-                <li><a href="#booking" class="btn-nav">احجز الآن</a></li>
+            </a>
+
+            <ul class="modern-nav-menu" id="modernNavMenu">
+                <li><a href="#home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                <li><a href="#about"><i class="fas fa-user-md"></i> من نحن</a></li>
+                <li><a href="#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
+                <li><a href="#packages"><i class="fas fa-box"></i> الباقات</a></li>
+                <li><a href="#reviews"><i class="fas fa-star"></i> آراء العملاء</a></li>
+                <li><a href="#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
             </ul>
-            <div class="hamburger" id="hamburger">
+
+            <div class="modern-hamburger" id="modernHamburger">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -82,563 +84,422 @@ $site_address = getSetting('site_address', 'Cairo, Egypt');
         </div>
     </nav>
 
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="preloader-content">
-            <?php
-            $site_logo = getSetting('site_logo', '');
-            if ($site_logo):
-            ?>
-                <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" class="preloader-logo">
-            <?php else: ?>
-                <i class="fas fa-tooth preloader-icon"></i>
-            <?php endif; ?>
-            <div class="preloader-spinner"></div>
-        </div>
-    </div>
-
-    <!-- Hero Slider Section -->
-    <section id="home" class="hero-slider">
-        <?php if (count($sliders) > 0): ?>
-        <div class="slider-container">
-            <?php foreach ($sliders as $index => $slider): ?>
-            <div class="slide <?php echo $index === 0 ? 'active' : ''; ?>" style="background-image: url('<?php echo UPLOAD_URL . htmlspecialchars($slider['image']); ?>');">
-                <div class="hero-overlay"></div>
-                <div class="container hero-content">
-                    <h1 class="hero-title" data-aos="fade-up"><?php echo htmlspecialchars($slider['title']); ?></h1>
-                    <?php if ($slider['subtitle']): ?>
-                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100"><?php echo htmlspecialchars($slider['subtitle']); ?></p>
-                    <?php endif; ?>
-                    <?php if ($slider['button_text'] && $slider['button_link']): ?>
-                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
-                        <a href="<?php echo htmlspecialchars($slider['button_link']); ?>" class="btn btn-primary">
-                            <?php echo htmlspecialchars($slider['button_text']); ?>
+    <!-- Modern Hero -->
+    <section id="home" class="modern-hero">
+        <div class="container">
+            <div class="modern-hero-content">
+                <div class="modern-hero-text">
+                    <h1>
+                        <?php
+                        $title_parts = explode(' ', $hero_title);
+                        $last_word = array_pop($title_parts);
+                        echo implode(' ', $title_parts) . ' <span>' . $last_word . '</span>';
+                        ?>
+                    </h1>
+                    <p><?php echo htmlspecialchars($hero_subtitle); ?></p>
+                    <div class="modern-hero-buttons">
+                        <a href="#booking" class="modern-btn modern-btn-primary">
+                            <i class="fas fa-calendar-check"></i>
+                            احجز موعدك الآن
+                        </a>
+                        <a href="#services" class="modern-btn modern-btn-secondary">
+                            <i class="fas fa-info-circle"></i>
+                            اعرف المزيد
                         </a>
                     </div>
+                </div>
+                <div class="modern-hero-image">
+                    <?php if ($hero_slider && !empty($hero_slider['image'])): ?>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($hero_slider['image']); ?>" alt="Hero">
+                    <?php else: ?>
+                        <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=800" alt="Dental Care">
                     <?php endif; ?>
                 </div>
             </div>
-            <?php endforeach; ?>
-
-            <?php if (count($sliders) > 1): ?>
-            <!-- Slider Controls -->
-            <button class="slider-control prev" onclick="changeSlide(-1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <button class="slider-control next" onclick="changeSlide(1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-
-            <!-- Slider Dots -->
-            <div class="slider-dots">
-                <?php foreach ($sliders as $index => $slider): ?>
-                <span class="dot <?php echo $index === 0 ? 'active' : ''; ?>" onclick="setSlide(<?php echo $index; ?>)"></span>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
         </div>
-        <?php else: ?>
-        <!-- Fallback Hero if no sliders -->
-        <div class="hero">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content">
-                <h1 class="hero-title"><?php echo htmlspecialchars($hero_title); ?></h1>
-                <p class="hero-subtitle"><?php echo htmlspecialchars($hero_subtitle); ?></p>
-                <div class="hero-buttons">
-                    <a href="#booking" class="btn btn-primary">احجز موعد</a>
-                    <a href="#services" class="btn btn-outline">تعرف على خدماتنا</a>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <!-- Features Section -->
+    <section id="about" class="modern-section" style="background: white;">
         <div class="container">
-            <div class="about-content">
-                <div class="about-image">
-                    <img src="images/doctor-placeholder.jpg" alt="<?php echo htmlspecialchars($doctor_name); ?>">
-                </div>
-                <div class="about-text">
-                    <h2><?php echo htmlspecialchars($doctor_name); ?></h2>
-                    <h3><?php echo htmlspecialchars($doctor_title); ?></h3>
-                    <p><?php echo nl2br(htmlspecialchars($doctor_bio)); ?></p>
-                    <div class="about-stats">
-                        <div class="stat">
-                            <i class="fas fa-award"></i>
-                            <h4>+10 سنوات</h4>
-                            <p>من الخبرة</p>
-                        </div>
-                        <div class="stat">
-                            <i class="fas fa-users"></i>
-                            <h4>+1000</h4>
-                            <p>عميل سعيد</p>
-                        </div>
-                        <div class="stat">
-                            <i class="fas fa-smile"></i>
-                            <h4>100%</h4>
-                            <p>رضا العملاء</p>
-                        </div>
+            <div class="modern-section-header">
+                <span class="modern-section-badge">لماذا نحن</span>
+                <h2 class="modern-section-title">لماذا تختار عيادتنا؟</h2>
+                <p class="modern-section-subtitle">نقدم أفضل خدمات طب الأسنان باستخدام أحدث التقنيات والمعدات</p>
+            </div>
+
+            <div class="modern-features-grid">
+                <div class="modern-feature-card">
+                    <div class="modern-feature-icon">
+                        <i class="fas fa-award"></i>
                     </div>
+                    <h3 class="modern-feature-title">خبرة طويلة</h3>
+                    <p class="modern-feature-description">أكثر من 15 عاماً من الخبرة في مجال طب الأسنان وعلاج جميع الحالات</p>
+                </div>
+
+                <div class="modern-feature-card">
+                    <div class="modern-feature-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3 class="modern-feature-title">أحدث التقنيات</h3>
+                    <p class="modern-feature-description">نستخدم أحدث الأجهزة والتقنيات في التشخيص والعلاج</p>
+                </div>
+
+                <div class="modern-feature-card">
+                    <div class="modern-feature-icon">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <h3 class="modern-feature-title">رعاية شاملة</h3>
+                    <p class="modern-feature-description">نوفر جميع خدمات طب الأسنان في مكان واحد</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section id="services" class="services">
+    <section id="services" class="modern-section">
         <div class="container">
-            <div class="section-header">
-                <h2>خدماتنا</h2>
-                <p>نقدم مجموعة متكاملة من خدمات طب الأسنان</p>
+            <div class="modern-section-header">
+                <span class="modern-section-badge">خدماتنا</span>
+                <h2 class="modern-section-title">خدمات متكاملة لصحة أسنانك</h2>
+                <p class="modern-section-subtitle">نقدم مجموعة واسعة من الخدمات الطبية المتخصصة</p>
             </div>
-            <div class="services-grid">
+
+            <div class="modern-services-grid">
                 <?php foreach ($services as $service): ?>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas <?php echo htmlspecialchars($service['icon'] ?: 'fa-tooth'); ?>"></i>
+                <div class="modern-service-card">
+                    <?php if (!empty($service['image'])): ?>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($service['image']); ?>"
+                             alt="<?php echo htmlspecialchars($service['title']); ?>"
+                             class="modern-service-image">
+                    <?php else: ?>
+                        <div class="modern-service-image" style="background: linear-gradient(135deg, var(--primary-light), var(--accent)); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-tooth" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                    <?php endif; ?>
+                    <div class="modern-service-content">
+                        <h3 class="modern-service-title"><?php echo htmlspecialchars($service['title']); ?></h3>
+                        <p class="modern-service-description">
+                            <?php
+                            $desc = isset($service['short_description']) && !empty($service['short_description'])
+                                    ? $service['short_description']
+                                    : $service['description'];
+                            echo htmlspecialchars($desc);
+                            ?>
+                        </p>
+                        <a href="service-details.php?id=<?php echo $service['id']; ?>" class="modern-service-link">
+                            اعرف المزيد
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
                     </div>
-                    <h3><?php echo htmlspecialchars($service['title']); ?></h3>
-                    <p><?php echo htmlspecialchars($service['description']); ?></p>
                 </div>
                 <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Doctors Slider Section -->
+    <section id="doctors" class="modern-section" style="background: white;">
+        <div class="container">
+            <div class="modern-section-header">
+                <span class="modern-section-badge">فريقنا الطبي</span>
+                <h2 class="modern-section-title">تعرف على فريق الدكاترة</h2>
+                <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
+            </div>
+
+            <div class="doctors-slider-wrapper">
+                <div class="doctors-slider" id="doctorsSlider">
+                    <?php
+                    // Fetch active doctors
+                    $stmt = $conn->prepare("SELECT * FROM doctors WHERE is_active = 1 ORDER BY display_order ASC");
+                    $stmt->execute();
+                    $doctors = $stmt->fetchAll();
+
+                    foreach ($doctors as $doctor):
+                    ?>
+                    <div class="doctor-card">
+                        <div class="doctor-card-inner">
+                            <div class="doctor-image-wrapper">
+                                <?php if (!empty($doctor['image'])): ?>
+                                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
+                                         alt="<?php echo htmlspecialchars($doctor['name']); ?>"
+                                         class="doctor-image">
+                                <?php else: ?>
+                                    <div class="doctor-image doctor-image-placeholder">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($doctor['years_experience'] > 0): ?>
+                                <div class="doctor-badge">
+                                    <i class="fas fa-award"></i>
+                                    <?php echo $doctor['years_experience']; ?> سنة خبرة
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="doctor-info">
+                                <h3 class="doctor-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
+                                <p class="doctor-title"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                                <p class="doctor-specialization">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <?php echo htmlspecialchars($doctor['specialization']); ?>
+                                </p>
+                                <p class="doctor-bio"><?php echo htmlspecialchars($doctor['bio']); ?></p>
+
+                                <?php if ($doctor['phone'] || $doctor['email']): ?>
+                                <div class="doctor-contact">
+                                    <?php if ($doctor['phone']): ?>
+                                    <a href="tel:<?php echo htmlspecialchars($doctor['phone']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['email']): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($doctor['email']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if ($doctor['facebook'] || $doctor['instagram'] || $doctor['twitter']): ?>
+                                <div class="doctor-social">
+                                    <?php if ($doctor['facebook']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['instagram']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['twitter']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Slider Navigation -->
+                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Slider Dots -->
+                <div class="slider-dots" id="sliderDots"></div>
             </div>
         </div>
     </section>
 
     <!-- Packages Section -->
-    <section id="packages" class="packages">
+    <section id="packages" class="modern-section" style="background: white;">
         <div class="container">
-            <div class="section-header">
-                <h2>باقاتنا</h2>
-                <p>اختر الباقة المناسبة لك</p>
+            <div class="modern-section-header">
+                <span class="modern-section-badge">الباقات</span>
+                <h2 class="modern-section-title">باقات علاجية مميزة</h2>
+                <p class="modern-section-subtitle">اختر الباقة المناسبة لك</p>
             </div>
-            <div class="packages-grid">
+
+            <div class="modern-services-grid">
                 <?php foreach ($packages as $package): ?>
-                <div class="package-card <?php echo $package['is_popular'] ? 'popular' : ''; ?>">
-                    <?php if ($package['is_popular']): ?>
-                    <div class="popular-badge">الأكثر طلباً</div>
+                <div class="modern-service-card">
+                    <?php if (!empty($package['image'])): ?>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($package['image']); ?>"
+                             alt="<?php echo htmlspecialchars($package['name']); ?>"
+                             class="modern-service-image">
                     <?php endif; ?>
-                    <h3><?php echo htmlspecialchars($package['name']); ?></h3>
-                    <div class="package-price">
-                        <span class="price"><?php echo number_format($package['price'], 0); ?></span>
-                        <span class="currency">جنيه</span>
-                    </div>
-                    <?php if ($package['duration']): ?>
-                    <p class="duration">
-                        <i class="fas fa-clock"></i> <?php echo htmlspecialchars($package['duration']); ?>
-                    </p>
-                    <?php endif; ?>
-                    <p class="package-description"><?php echo htmlspecialchars($package['description']); ?></p>
-                    <?php if ($package['features']): ?>
-                    <ul class="package-features">
-                        <?php foreach (explode("\n", $package['features']) as $feature): ?>
-                            <?php if (trim($feature)): ?>
-                            <li><i class="fas fa-check"></i> <?php echo htmlspecialchars(trim($feature)); ?></li>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                    <a href="#booking" class="btn btn-primary btn-block" onclick="selectPackage(<?php echo $package['id']; ?>, '<?php echo htmlspecialchars($package['name'], ENT_QUOTES); ?>')">احجز الآن</a>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog Section -->
-    <?php if (count($blog_posts) > 0): ?>
-    <section id="blog" class="blog">
-        <div class="container">
-            <div class="section-header">
-                <h2>مقالاتنا</h2>
-                <p>آخر المقالات والنصائح الطبية</p>
-            </div>
-            <div class="blog-grid">
-                <?php foreach ($blog_posts as $post): ?>
-                <div class="blog-card">
-                    <?php if ($post['featured_image']): ?>
-                    <div class="blog-image">
-                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                    </div>
-                    <?php endif; ?>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="fas fa-calendar"></i> <?php echo formatDate($post['published_at']); ?></span>
-                            <?php if ($post['author']): ?>
-                            <span><i class="fas fa-user"></i> <?php echo htmlspecialchars($post['author']); ?></span>
-                            <?php endif; ?>
+                    <div class="modern-service-content">
+                        <h3 class="modern-service-title"><?php echo htmlspecialchars($package['name']); ?></h3>
+                        <p class="modern-service-description">
+                            <?php
+                            $desc = isset($package['short_description']) && !empty($package['short_description'])
+                                    ? $package['short_description']
+                                    : $package['description'];
+                            echo htmlspecialchars($desc);
+                            ?>
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                            <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">
+                                <?php echo number_format($package['price']); ?> جنيه
+                            </span>
+                            <a href="#booking" class="modern-btn modern-btn-primary" style="padding: 10px 20px; font-size: 14px;">
+                                احجز الآن
+                            </a>
                         </div>
-                        <h3><?php echo htmlspecialchars($post['title']); ?></h3>
-                        <p><?php echo htmlspecialchars($post['excerpt']); ?></p>
-                        <a href="blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" class="read-more">اقرأ المزيد <i class="fas fa-arrow-left"></i></a>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="text-center" style="margin-top: 30px;">
-                <a href="blog.php" class="btn btn-outline">عرض جميع المقالات</a>
-            </div>
-        </div>
-    </section>
-    <?php endif; ?>
-
-    <!-- Reviews Section -->
-    <?php if (count($reviews) > 0): ?>
-    <section id="reviews" class="reviews">
-        <div class="container">
-            <div class="section-header">
-                <h2>آراء عملائنا</h2>
-                <p>ماذا يقول عملاؤنا عنا</p>
-            </div>
-            <div class="reviews-grid">
-                <?php foreach ($reviews as $review): ?>
-                <div class="review-card">
-                    <div class="review-rating">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <i class="fas fa-star <?php echo $i <= $review['rating'] ? 'active' : ''; ?>"></i>
-                        <?php endfor; ?>
-                    </div>
-                    <p class="review-text">"<?php echo htmlspecialchars($review['review_text']); ?>"</p>
-                    <div class="review-author">
-                        <strong><?php echo htmlspecialchars($review['client_name']); ?></strong>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </section>
-    <?php endif; ?>
 
     <!-- Booking Section -->
-    <section id="booking" class="booking">
+    <section id="booking" class="modern-section">
         <div class="container">
-            <div class="section-header">
-                <h2>احجز موعدك الآن</h2>
-                <p>املأ البيانات وسنتواصل معك قريباً</p>
+            <div class="modern-section-header">
+                <span class="modern-section-badge">احجز موعدك</span>
+                <h2 class="modern-section-title">احجز موعدك الآن</h2>
+                <p class="modern-section-subtitle">املأ النموذج وسنتواصل معك في أقرب وقت</p>
             </div>
-            <div class="booking-form-container">
-                <form id="bookingForm" class="booking-form" method="POST" action="api/submit-booking.php">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="client_name">الاسم الكامل *</label>
-                            <input type="text" id="client_name" name="client_name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="client_email">البريد الإلكتروني</label>
-                            <input type="email" id="client_email" name="client_email" placeholder="example@email.com">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="client_phone">رقم الهاتف *</label>
-                            <input type="tel" id="client_phone" name="client_phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="client_whatsapp">رقم الواتساب *</label>
-                            <input type="tel" id="client_whatsapp" name="client_whatsapp" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="booking_date">تاريخ الحجز *</label>
-                            <input type="date" id="booking_date" name="booking_date" required min="<?php echo date('Y-m-d'); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="client_address">العنوان</label>
-                            <input type="text" id="client_address" name="client_address">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="package_id">اختر الباقة *</label>
-                        <select id="package_id" name="package_id" required>
-                            <option value="">-- اختر الباقة --</option>
-                            <?php foreach ($packages as $package): ?>
-                            <option value="<?php echo $package['id']; ?>" data-price="<?php echo $package['price']; ?>">
-                                <?php echo htmlspecialchars($package['name']); ?> - <?php echo number_format($package['price'], 0); ?> جنيه
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="notes">ملاحظات إضافية</label>
-                        <textarea id="notes" name="notes" rows="4"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block btn-lg">
-                        <i class="fas fa-paper-plane"></i> إرسال الحجز
-                    </button>
-                </form>
-            </div>
+
+            <form class="modern-booking-form" id="modernBookingForm">
+                <div class="modern-form-group">
+                    <label class="modern-label">الاسم الكامل *</label>
+                    <input type="text" name="client_name" class="modern-input" required>
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">رقم الهاتف *</label>
+                    <input type="tel" name="client_phone" class="modern-input" required>
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">رقم واتساب *</label>
+                    <input type="tel" name="client_whatsapp" class="modern-input" required>
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">البريد الإلكتروني</label>
+                    <input type="email" name="client_email" class="modern-input">
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">العنوان</label>
+                    <input type="text" name="client_address" class="modern-input">
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">تاريخ الحجز *</label>
+                    <input type="date" name="booking_date" class="modern-input" required min="<?php echo date('Y-m-d'); ?>">
+                </div>
+
+                <div class="modern-form-group">
+                    <label class="modern-label">اختر الباقة *</label>
+                    <select name="package_id" class="modern-select" required>
+                        <option value="">اختر الباقة</option>
+                        <?php foreach ($packages as $package): ?>
+                        <option value="<?php echo $package['id']; ?>">
+                            <?php echo htmlspecialchars($package['name']); ?> - <?php echo number_format($package['price']); ?> جنيه
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <button type="submit" class="modern-btn modern-btn-primary" style="width: 100%;">
+                    <i class="fas fa-paper-plane"></i>
+                    إرسال الحجز
+                </button>
+            </form>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact">
-        <div class="container">
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <div>
-                        <h4>الهاتف</h4>
-                        <p><?php echo htmlspecialchars($site_phone); ?></p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <div>
-                        <h4>البريد الإلكتروني</h4>
-                        <p><?php echo htmlspecialchars($site_email); ?></p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <h4>العنوان</h4>
-                        <p><?php echo htmlspecialchars($site_address); ?></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <h3><?php echo htmlspecialchars($site_name); ?></h3>
-                    <p><?php echo htmlspecialchars($doctor_bio); ?></p>
-                </div>
-                <div class="footer-links">
-                    <h4>روابط سريعة</h4>
-                    <ul>
-                        <li><a href="#home">الرئيسية</a></li>
-                        <li><a href="#about">عن الدكتور</a></li>
-                        <li><a href="#services">الخدمات</a></li>
-                        <li><a href="#packages">الباقات</a></li>
-                    </ul>
-                </div>
-                <div class="footer-social">
-                    <h4>تواصل معنا</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
     <script>
-    // Preloader
-    window.addEventListener('load', function() {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 300);
-            }, 800);
-        }
+    // Mobile menu toggle
+    document.getElementById('modernHamburger').addEventListener('click', function() {
+        document.getElementById('modernNavMenu').classList.toggle('active');
     });
 
-    // Hero Slider
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.slide');
-    const dots = document.querySelectorAll('.dot');
-    const totalSlides = slides.length;
-    let slideInterval;
-
-    function showSlide(n) {
-        if (totalSlides === 0) return;
-
-        currentSlide = (n + totalSlides) % totalSlides;
-
-        slides.forEach((slide, index) => {
-            slide.classList.remove('active');
-            if (index === currentSlide) {
-                slide.classList.add('active');
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('modernNavMenu').classList.remove('active');
             }
         });
+    });
 
-        dots.forEach((dot, index) => {
-            dot.classList.remove('active');
-            if (index === currentSlide) {
-                dot.classList.add('active');
-            }
-        });
-    }
+    // Booking form submission
+    document.getElementById('modernBookingForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-    function changeSlide(direction) {
-        showSlide(currentSlide + direction);
-        resetSlideInterval();
-    }
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
 
-    function setSlide(n) {
-        showSlide(n);
-        resetSlideInterval();
-    }
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
 
-    function resetSlideInterval() {
-        if (slideInterval) {
-            clearInterval(slideInterval);
-        }
-        if (totalSlides > 1) {
-            slideInterval = setInterval(() => {
-                showSlide(currentSlide + 1);
-            }, 5000); // Auto-rotate every 5 seconds
-        }
-    }
+        try {
+            const response = await fetch('api/submit-booking.php', {
+                method: 'POST',
+                body: formData
+            });
 
-    // Start auto-rotation if there are multiple slides
-    if (totalSlides > 1) {
-        resetSlideInterval();
-    }
+            const data = await response.json();
 
-    // Package Pre-selection from sessionStorage
-    document.addEventListener('DOMContentLoaded', function() {
-        const packageSelect = document.getElementById('package_id');
-        if (packageSelect && typeof(Storage) !== "undefined") {
-            const selectedPackage = sessionStorage.getItem('selectedPackage');
-            if (selectedPackage) {
-                packageSelect.value = selectedPackage;
-                sessionStorage.removeItem('selectedPackage');
-
-                // Scroll to booking form
-                const bookingSection = document.getElementById('booking');
-                if (bookingSection) {
-                    setTimeout(() => {
-                        bookingSection.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
+            if (data.success) {
+                alert(data.message);
+                this.reset();
+            } else {
+                alert(data.message);
+                if (data.debug) {
+                    console.error('Debug:', data.debug);
                 }
             }
-        }
-
-        // Motion.js Animations
-        if (typeof Motion !== 'undefined') {
-            const { inView, animate, timeline } = Motion;
-
-            // Animate section headers
-            inView('.section-header', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['translateY(30px)', 'translateY(0)']
-                    },
-                    { duration: 0.8, delay: 0.2 }
-                );
-            });
-
-            // Animate service cards
-            inView('.service-card', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['scale(0.9)', 'scale(1)']
-                    },
-                    { duration: 0.6, delay: 0.1 }
-                );
-            });
-
-            // Animate package cards with stagger
-            inView('.package-card', ({ target }) => {
-                const index = Array.from(document.querySelectorAll('.package-card')).indexOf(target);
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['translateY(50px)', 'translateY(0)']
-                    },
-                    { duration: 0.8, delay: index * 0.15 }
-                );
-            });
-
-            // Animate review cards
-            inView('.review-card', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['translateX(-30px)', 'translateX(0)']
-                    },
-                    { duration: 0.7, delay: 0.2 }
-                );
-            });
-
-            // Animate blog cards
-            inView('.blog-card', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['translateY(40px)', 'translateY(0)']
-                    },
-                    { duration: 0.8, delay: 0.2 }
-                );
-            });
-
-            // Animate booking form
-            inView('.booking-form', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['scale(0.95)', 'scale(1)']
-                    },
-                    { duration: 0.8, delay: 0.2 }
-                );
-            });
-
-            // Animate footer sections
-            inView('.footer-section', ({ target }) => {
-                animate(target,
-                    {
-                        opacity: [0, 1],
-                        transform: ['translateY(20px)', 'translateY(0)']
-                    },
-                    { duration: 0.6, delay: 0.15 }
-                );
-            });
-
-            // Hover animations for service cards
-            document.querySelectorAll('.service-card').forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    animate(card,
-                        { transform: 'translateY(-10px)' },
-                        { duration: 0.3 }
-                    );
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    animate(card,
-                        { transform: 'translateY(0)' },
-                        { duration: 0.3 }
-                    );
-                });
-            });
-
-            // Hover animations for package cards
-            document.querySelectorAll('.package-card').forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    animate(card,
-                        { transform: 'translateY(-8px) scale(1.02)' },
-                        { duration: 0.3 }
-                    );
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    animate(card,
-                        { transform: 'translateY(0) scale(1)' },
-                        { duration: 0.3 }
-                    );
-                });
-            });
+        } catch (error) {
+            alert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+            console.error('Error:', error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         }
     });
+
+    // Doctors Slider
+    let currentSlide = 0;
+    const doctorCards = document.querySelectorAll('.doctor-card');
+    const totalDoctors = doctorCards.length;
+    const dotsContainer = document.getElementById('sliderDots');
+
+    // Don't init slider if no doctors
+    if (totalDoctors > 0) {
+        // Create dots
+        const totalPages = Math.ceil(totalDoctors / 3);
+        for (let i = 0; i < totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'slider-dot';
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateSlider() {
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = Math.max(0, Math.min(index, totalPages - 1));
+            updateSlider();
+        }
+
+        window.slideDoctors = function(direction) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = (currentSlide + direction + totalPages) % totalPages;
+            updateSlider();
+        };
+
+        // Auto-slide every 5 seconds
+        setInterval(() => {
+            if (totalDoctors > 3) {
+                slideDoctors(1);
+            }
+        }, 5000);
+    }
     </script>
 </body>
 </html>

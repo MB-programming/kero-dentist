@@ -1,0 +1,121 @@
+<?php
+require_once __DIR__ . '/../../includes/config.php';
+requireLogin();
+
+$current_page = basename($_SERVER['PHP_SELF'], '.php');
+?>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title ?? 'لوحة التحكم'; ?></title>
+
+    <!-- Bootstrap 5 RTL -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-tooth"></i>
+                <h2>لوحة التحكم</h2>
+                <p><?php echo htmlspecialchars($_SESSION['admin_username']); ?></p>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="/admin/index.php" class="<?php echo $current_page === 'index' ? 'active' : ''; ?>">
+                        <i class="fas fa-home"></i>
+                        <span>الرئيسية</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/bookings.php" class="<?php echo $current_page === 'bookings' ? 'active' : ''; ?>">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>الحجوزات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/sliders.php" class="<?php echo $current_page === 'sliders' ? 'active' : ''; ?>">
+                        <i class="fas fa-images"></i>
+                        <span>السلايدر</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/services.php" class="<?php echo $current_page === 'services' ? 'active' : ''; ?>">
+                        <i class="fas fa-tooth"></i>
+                        <span>الخدمات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/packages.php" class="<?php echo $current_page === 'packages' ? 'active' : ''; ?>">
+                        <i class="fas fa-box"></i>
+                        <span>الباقات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/blog.php" class="<?php echo $current_page === 'blog' ? 'active' : ''; ?>">
+                        <i class="fas fa-newspaper"></i>
+                        <span>المقالات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/reviews.php" class="<?php echo $current_page === 'reviews' ? 'active' : ''; ?>">
+                        <i class="fas fa-star"></i>
+                        <span>التقييمات</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/email-templates.php" class="<?php echo $current_page === 'email-templates' ? 'active' : ''; ?>">
+                        <i class="fas fa-envelope"></i>
+                        <span>قوالب البريد</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/menu.php" class="<?php echo $current_page === 'menu' ? 'active' : ''; ?>">
+                        <i class="fas fa-bars"></i>
+                        <span>القوائم</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/media.php" class="<?php echo $current_page === 'media' ? 'active' : ''; ?>">
+                        <i class="fas fa-photo-video"></i>
+                        <span>المكتبة</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/users.php" class="<?php echo $current_page === 'users' ? 'active' : ''; ?>">
+                        <i class="fas fa-users"></i>
+                        <span>المستخدمين</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/settings.php" class="<?php echo $current_page === 'settings' ? 'active' : ''; ?>">
+                        <i class="fas fa-cog"></i>
+                        <span>الإعدادات</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="/index.php" target="_blank">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>مشاهدة الموقع</span>
+                </a>
+                <a href="/admin/logout.php">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
