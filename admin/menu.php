@@ -202,17 +202,7 @@ include 'includes/header.php';
                             </small>
                         </td>
                         <td><?php echo $item['display_order']; ?></td>
-                        <td>
-                            <?php
-                            if ($item['parent_id']) {
-                                $parent = array_filter($parent_items, fn($p) => $p['id'] == $item['parent_id']);
-                                $parent = reset($parent);
-                                echo $parent ? htmlspecialchars($parent['title']) : '-';
-                            } else {
-                                echo '-';
-                            }
-                            ?>
-                        </td>
+                        <td>-</td>
                         <td>
                             <?php if ($item['is_active']): ?>
                             <span class="badge badge-success">نشط</span>
@@ -278,17 +268,7 @@ include 'includes/header.php';
                             </small>
                         </td>
                         <td><?php echo $item['display_order']; ?></td>
-                        <td>
-                            <?php
-                            if ($item['parent_id']) {
-                                $parent = array_filter($parent_items, fn($p) => $p['id'] == $item['parent_id']);
-                                $parent = reset($parent);
-                                echo $parent ? htmlspecialchars($parent['title']) : '-';
-                            } else {
-                                echo '-';
-                            }
-                            ?>
-                        </td>
+                        <td>-</td>
                         <td>
                             <?php if ($item['is_active']): ?>
                             <span class="badge badge-success">نشط</span>

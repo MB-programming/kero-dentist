@@ -191,6 +191,107 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
         </div>
     </section>
 
+    <!-- Doctors Slider Section -->
+    <section id="doctors" class="modern-section" style="background: white;">
+        <div class="container">
+            <div class="modern-section-header">
+                <span class="modern-section-badge">فريقنا الطبي</span>
+                <h2 class="modern-section-title">تعرف على فريق الدكاترة</h2>
+                <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
+            </div>
+
+            <div class="doctors-slider-wrapper">
+                <div class="doctors-slider" id="doctorsSlider">
+                    <?php
+                    // Fetch active doctors
+                    $stmt = $conn->prepare("SELECT * FROM doctors WHERE is_active = 1 ORDER BY display_order ASC");
+                    $stmt->execute();
+                    $doctors = $stmt->fetchAll();
+
+                    foreach ($doctors as $doctor):
+                    ?>
+                    <div class="doctor-card">
+                        <div class="doctor-card-inner">
+                            <div class="doctor-image-wrapper">
+                                <?php if (!empty($doctor['image'])): ?>
+                                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
+                                         alt="<?php echo htmlspecialchars($doctor['name']); ?>"
+                                         class="doctor-image">
+                                <?php else: ?>
+                                    <div class="doctor-image doctor-image-placeholder">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($doctor['years_experience'] > 0): ?>
+                                <div class="doctor-badge">
+                                    <i class="fas fa-award"></i>
+                                    <?php echo $doctor['years_experience']; ?> سنة خبرة
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="doctor-info">
+                                <h3 class="doctor-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
+                                <p class="doctor-title"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                                <p class="doctor-specialization">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <?php echo htmlspecialchars($doctor['specialization']); ?>
+                                </p>
+                                <p class="doctor-bio"><?php echo htmlspecialchars($doctor['bio']); ?></p>
+
+                                <?php if ($doctor['phone'] || $doctor['email']): ?>
+                                <div class="doctor-contact">
+                                    <?php if ($doctor['phone']): ?>
+                                    <a href="tel:<?php echo htmlspecialchars($doctor['phone']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['email']): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($doctor['email']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if ($doctor['facebook'] || $doctor['instagram'] || $doctor['twitter']): ?>
+                                <div class="doctor-social">
+                                    <?php if ($doctor['facebook']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['instagram']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['twitter']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Slider Navigation -->
+                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Slider Dots -->
+                <div class="slider-dots" id="sliderDots"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Packages Section -->
     <section id="packages" class="modern-section" style="background: white;">
         <div class="container">
@@ -340,6 +441,51 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
             submitBtn.innerHTML = originalText;
         }
     });
+
+    // Doctors Slider
+    let currentSlide = 0;
+    const doctorCards = document.querySelectorAll('.doctor-card');
+    const totalDoctors = doctorCards.length;
+    const dotsContainer = document.getElementById('sliderDots');
+
+    // Don't init slider if no doctors
+    if (totalDoctors > 0) {
+        // Create dots
+        const totalPages = Math.ceil(totalDoctors / 3);
+        for (let i = 0; i < totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'slider-dot';
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateSlider() {
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = Math.max(0, Math.min(index, totalPages - 1));
+            updateSlider();
+        }
+
+        window.slideDoctors = function(direction) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = (currentSlide + direction + totalPages) % totalPages;
+            updateSlider();
+        };
+
+        // Auto-slide every 5 seconds
+        setInterval(() => {
+            if (totalDoctors > 3) {
+                slideDoctors(1);
+            }
+        }, 5000);
+    }
     </script>
 </body>
 </html>

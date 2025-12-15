@@ -97,6 +97,11 @@ $admin_initial = mb_substr($admin_username, 0, 1);
                     <span>الخدمات</span>
                 </a>
 
+                <a href="doctors.php" class="fb-menu-item <?php echo $current_page === 'doctors' ? 'active' : ''; ?>">
+                    <i class="fas fa-user-md"></i>
+                    <span>الدكاترة</span>
+                </a>
+
                 <a href="packages.php" class="fb-menu-item <?php echo $current_page === 'packages' ? 'active' : ''; ?>">
                     <i class="fas fa-box"></i>
                     <span>الباقات</span>
