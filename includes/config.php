@@ -8,9 +8,24 @@ define('DB_NAME', 'u186120816_tantawy');
 // Site Configuration - Auto detect
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+
+// Detect if we're in admin or main site
+$script_name = $_SERVER['SCRIPT_NAME'];
+$is_admin = strpos($script_name, '/admin/') !== false;
+
+// Base path detection
+if ($is_admin) {
+    // If in admin, go up one level
+    $base_path = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\');
+} else {
+    $base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+}
 
 define('SITE_URL', $protocol . '://' . $host . $base_path);
+define('BASE_PATH', __DIR__ . '/..');
+define('ADMIN_URL', SITE_URL . '/admin');
+define('ASSETS_URL', SITE_URL . '/assets');
+define('UPLOAD_DIR', BASE_PATH . '/uploads');
 define('UPLOAD_PATH', __DIR__ . '/../uploads/');
 define('UPLOAD_URL', SITE_URL . '/uploads/');
 
