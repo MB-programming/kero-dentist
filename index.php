@@ -26,6 +26,15 @@ $stmt = $conn->prepare("SELECT * FROM blog_posts WHERE is_published = 1 ORDER BY
 $stmt->execute();
 $blog_posts = $stmt->fetchAll();
 
+// Fetch menu items
+$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
+$stmt->execute();
+$header_menu = $stmt->fetchAll();
+
+$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'footer' ORDER BY display_order ASC");
+$stmt->execute();
+$footer_menu = $stmt->fetchAll();
+
 // Get site settings
 $site_name = getSetting('site_name', 'عيادة الدكتور');
 $site_logo = getSetting('site_logo', '');
@@ -83,12 +92,19 @@ $social_youtube = getSetting('social_youtube', '');
                 </a>
 
                 <ul class="modern-nav-menu" id="modernNavMenu">
-                    <li><a href="#home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
-                    <li><a href="#about"><i class="fas fa-user-md"></i> من نحن</a></li>
-                    <li><a href="#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
-                    <li><a href="#packages"><i class="fas fa-box"></i> الباقات</a></li>
-                    <li><a href="#reviews"><i class="fas fa-star"></i> آراء العملاء</a></li>
-                    <li><a href="#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
+                    <?php if (count($header_menu) > 0): ?>
+                        <?php foreach ($header_menu as $item): ?>
+                            <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <!-- Default menu if no items in database -->
+                        <li><a href="#home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                        <li><a href="#about"><i class="fas fa-user-md"></i> من نحن</a></li>
+                        <li><a href="#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
+                        <li><a href="#packages"><i class="fas fa-box"></i> الباقات</a></li>
+                        <li><a href="#reviews"><i class="fas fa-star"></i> آراء العملاء</a></li>
+                        <li><a href="#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
+                    <?php endif; ?>
                 </ul>
 
                 <div class="modern-nav-actions">
@@ -1090,12 +1106,19 @@ $social_youtube = getSetting('social_youtube', '');
                 <div class="footer-section">
                     <h3 class="footer-title">روابط سريعة</h3>
                     <ul class="footer-links">
-                        <li><a href="#home">الرئيسية</a></li>
-                        <li><a href="#about">من نحن</a></li>
-                        <li><a href="#services">الخدمات</a></li>
-                        <li><a href="#doctors">الدكاترة</a></li>
-                        <li><a href="#packages">الباقات</a></li>
-                        <li><a href="#blog">المدونة</a></li>
+                        <?php if (count($footer_menu) > 0): ?>
+                            <?php foreach ($footer_menu as $item): ?>
+                                <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <!-- Default footer menu -->
+                            <li><a href="#home">الرئيسية</a></li>
+                            <li><a href="#about">من نحن</a></li>
+                            <li><a href="#services">الخدمات</a></li>
+                            <li><a href="#doctors">الدكاترة</a></li>
+                            <li><a href="#packages">الباقات</a></li>
+                            <li><a href="#blog">المدونة</a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
 
