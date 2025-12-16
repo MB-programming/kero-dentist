@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     // Validate required fields
-    $required_fields = ['client_name', 'client_phone', 'client_whatsapp', 'booking_date', 'package_id'];
+    $required_fields = ['client_name', 'client_phone', 'client_whatsapp', 'booking_date', 'booking_time', 'package_id'];
     foreach ($required_fields as $field) {
         if (empty($_POST[$field])) {
             echo json_encode(['success' => false, 'message' => 'الرجاء ملء جميع الحقول المطلوبة: ' . $field]);
@@ -30,6 +30,7 @@ try {
     $client_whatsapp = sanitize($_POST['client_whatsapp']);
     $client_address = isset($_POST['client_address']) ? sanitize($_POST['client_address']) : '';
     $booking_date = sanitize($_POST['booking_date']);
+    $booking_time = sanitize($_POST['booking_time']);
     $booking_day = isset($_POST['booking_day']) ? sanitize($_POST['booking_day']) : '';
     $package_id = intval($_POST['package_id']);
 
@@ -71,10 +72,11 @@ try {
             client_phone,
             client_whatsapp,
             booking_date,
+            booking_time,
             booking_day,
             package_id,
             status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
 
     $success = $stmt->execute([
@@ -84,6 +86,7 @@ try {
         $client_phone,
         $client_whatsapp,
         $booking_date,
+        $booking_time,
         $booking_day,
         $package_id
     ]);

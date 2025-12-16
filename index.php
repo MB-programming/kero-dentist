@@ -62,6 +62,9 @@ $social_youtube = getSetting('social_youtube', '');
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- International Telephone Input -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/css/intlTelInput.css">
+
     <!-- Modern CSS -->
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
 </head>
@@ -552,12 +555,14 @@ $social_youtube = getSetting('social_youtube', '');
 
                 <div class="modern-form-group">
                     <label class="modern-label">رقم الهاتف *</label>
-                    <input type="tel" name="client_phone" class="modern-input" required>
+                    <input type="tel" name="client_phone" id="client_phone" class="modern-input" required>
+                    <div id="phone_carrier" class="phone-carrier-info" style="display: none;"></div>
                 </div>
 
                 <div class="modern-form-group">
                     <label class="modern-label">رقم واتساب *</label>
-                    <input type="tel" name="client_whatsapp" class="modern-input" required>
+                    <input type="tel" name="client_whatsapp" id="client_whatsapp" class="modern-input" required>
+                    <div id="whatsapp_carrier" class="phone-carrier-info" style="display: none;"></div>
                 </div>
 
                 <div class="modern-form-group">
@@ -570,9 +575,15 @@ $social_youtube = getSetting('social_youtube', '');
                     <input type="text" name="client_address" class="modern-input">
                 </div>
 
-                <div class="modern-form-group">
-                    <label class="modern-label">تاريخ الحجز *</label>
-                    <input type="date" name="booking_date" class="modern-input" required min="<?php echo date('Y-m-d'); ?>">
+                <div class="modern-form-row">
+                    <div class="modern-form-group">
+                        <label class="modern-label">تاريخ الحجز *</label>
+                        <input type="date" name="booking_date" class="modern-input" required min="<?php echo date('Y-m-d'); ?>">
+                    </div>
+                    <div class="modern-form-group">
+                        <label class="modern-label">الوقت المفضل *</label>
+                        <input type="time" name="booking_time" class="modern-input" required>
+                    </div>
                 </div>
 
                 <div class="modern-form-group">
@@ -609,6 +620,73 @@ $social_youtube = getSetting('social_youtube', '');
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('modernNavMenu').classList.remove('active');
+            }
+        });
+    });
+
+    // International Phone Input Setup
+    const phoneInputs = [
+        { input: document.querySelector("#client_phone"), carrier: document.querySelector("#phone_carrier") },
+        { input: document.querySelector("#client_whatsapp"), carrier: document.querySelector("#whatsapp_carrier") }
+    ];
+
+    const egyptianCarriers = {
+        '010': { name: 'فودافون', color: '#E60000' },
+        '011': { name: 'اتصالات', color: '#00B140' },
+        '012': { name: 'أورانج', color: '#FF6200' },
+        '015': { name: 'وي', color: '#6B2382' }
+    };
+
+    function detectEgyptianCarrier(number) {
+        // Remove spaces, dashes, and country code
+        const cleanNumber = number.replace(/[\s\-\(\)]/g, '').replace(/^\+20/, '');
+        const prefix = cleanNumber.substring(0, 3);
+
+        return egyptianCarriers[prefix] || null;
+    }
+
+    phoneInputs.forEach(({input, carrier}) => {
+        if (!input) return;
+
+        const iti = window.intlTelInput(input, {
+            initialCountry: "eg",
+            preferredCountries: ["eg", "sa", "ae", "kw", "qa"],
+            separateDialCode: true,
+            autoPlaceholder: "aggressive",
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/utils.js"
+        });
+
+        input.addEventListener('blur', function() {
+            const phoneNumber = iti.getNumber();
+            const countryData = iti.getSelectedCountryData();
+
+            // Check for Egyptian carrier
+            if (countryData.iso2 === 'eg') {
+                const carrierInfo = detectEgyptianCarrier(phoneNumber);
+                if (carrierInfo) {
+                    carrier.style.display = 'block';
+                    carrier.innerHTML = `<i class="fas fa-mobile-alt"></i> <span style="color: ${carrierInfo.color}; font-weight: 600;">${carrierInfo.name}</span>`;
+                } else {
+                    carrier.style.display = 'none';
+                }
+            } else {
+                carrier.style.display = 'none';
+            }
+        });
+
+        input.addEventListener('keyup', function() {
+            const phoneNumber = iti.getNumber();
+            const countryData = iti.getSelectedCountryData();
+
+            // Real-time carrier detection for Egyptian numbers
+            if (countryData.iso2 === 'eg' && phoneNumber.length >= 6) {
+                const carrierInfo = detectEgyptianCarrier(phoneNumber);
+                if (carrierInfo) {
+                    carrier.style.display = 'block';
+                    carrier.innerHTML = `<i class="fas fa-mobile-alt"></i> <span style="color: ${carrierInfo.color}; font-weight: 600;">${carrierInfo.name}</span>`;
+                } else {
+                    carrier.style.display = 'none';
+                }
             }
         });
     });
@@ -1057,5 +1135,8 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
         </div>
     </footer>
+
+    <!-- International Telephone Input JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/intlTelInput.min.js"></script>
 </body>
 </html>

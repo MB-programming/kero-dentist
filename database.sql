@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     `client_phone` VARCHAR(20) NOT NULL,
     `client_whatsapp` VARCHAR(20) NOT NULL,
     `booking_date` DATE NOT NULL,
+    `booking_time` TIME,
     `booking_day` VARCHAR(20) NOT NULL,
     `package_id` INT,
     `status` ENUM('pending', 'approved', 'rejected', 'completed', 'cancelled') DEFAULT 'pending',
@@ -65,6 +66,9 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     INDEX `idx_status` (`status`),
     INDEX `idx_booking_date` (`booking_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add booking_time column to existing bookings table
+ALTER TABLE `bookings` ADD COLUMN IF NOT EXISTS `booking_time` TIME AFTER `booking_date`;
 
 -- Blog Posts Table
 CREATE TABLE IF NOT EXISTS `blog_posts` (
