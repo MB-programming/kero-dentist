@@ -74,6 +74,9 @@ $social_youtube = getSetting('social_youtube', '');
     <!-- International Telephone Input -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/css/intlTelInput.css">
 
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <!-- Modern CSS -->
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
 </head>
@@ -604,14 +607,48 @@ $social_youtube = getSetting('social_youtube', '');
 
                 <div class="modern-form-group">
                     <label class="modern-label">اختر الباقة *</label>
-                    <select name="package_id" class="modern-select" required>
+                    <select name="package_id" id="package_select" class="modern-select" required>
                         <option value="">اختر الباقة</option>
                         <?php foreach ($packages as $package): ?>
-                        <option value="<?php echo $package['id']; ?>">
+                        <option value="<?php echo $package['id']; ?>"
+                                data-price="<?php echo $package['price']; ?>"
+                                data-description="<?php echo htmlspecialchars($package['description'] ?? ''); ?>"
+                                data-features="<?php echo htmlspecialchars($package['features'] ?? ''); ?>"
+                                data-duration="<?php echo htmlspecialchars($package['duration'] ?? ''); ?>">
                             <?php echo htmlspecialchars($package['name']); ?> - <?php echo number_format($package['price']); ?> جنيه
                         </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+
+                <!-- Package Details Preview -->
+                <div id="package_preview" class="package-preview" style="display: none;">
+                    <div class="package-preview-header">
+                        <i class="fas fa-box-open"></i>
+                        <h4>تفاصيل الباقة المختارة</h4>
+                    </div>
+                    <div class="package-preview-content">
+                        <div class="package-preview-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="package-preview-label">السعر:</span>
+                            <span id="preview_price" class="package-preview-value"></span>
+                        </div>
+                        <div class="package-preview-item" id="preview_duration_container" style="display: none;">
+                            <i class="fas fa-clock"></i>
+                            <span class="package-preview-label">المدة:</span>
+                            <span id="preview_duration" class="package-preview-value"></span>
+                        </div>
+                        <div class="package-preview-item" id="preview_description_container" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="package-preview-label">الوصف:</span>
+                            <span id="preview_description" class="package-preview-value"></span>
+                        </div>
+                        <div class="package-preview-features" id="preview_features_container" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="package-preview-label">المميزات:</span>
+                            <ul id="preview_features" class="package-features-list"></ul>
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" class="modern-btn modern-btn-primary" style="width: 100%;">
@@ -805,6 +842,69 @@ $social_youtube = getSetting('social_youtube', '');
         return null;
     }
 
+    // Package Preview Handler
+    const packageSelectEl = document.getElementById('package_select');
+    const packagePreview = document.getElementById('package_preview');
+
+    if (packageSelectEl) {
+        packageSelectEl.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+
+            if (this.value) {
+                const price = selectedOption.getAttribute('data-price');
+                const description = selectedOption.getAttribute('data-description');
+                const features = selectedOption.getAttribute('data-features');
+                const duration = selectedOption.getAttribute('data-duration');
+
+                // Show preview
+                packagePreview.style.display = 'block';
+
+                // Update price
+                document.getElementById('preview_price').textContent = parseFloat(price).toLocaleString('ar-EG') + ' جنيه';
+
+                // Update duration
+                if (duration && duration.trim() !== '') {
+                    document.getElementById('preview_duration_container').style.display = 'flex';
+                    document.getElementById('preview_duration').textContent = duration;
+                } else {
+                    document.getElementById('preview_duration_container').style.display = 'none';
+                }
+
+                // Update description
+                if (description && description.trim() !== '') {
+                    document.getElementById('preview_description_container').style.display = 'flex';
+                    document.getElementById('preview_description').textContent = description;
+                } else {
+                    document.getElementById('preview_description_container').style.display = 'none';
+                }
+
+                // Update features
+                if (features && features.trim() !== '') {
+                    document.getElementById('preview_features_container').style.display = 'block';
+                    const featuresList = document.getElementById('preview_features');
+                    featuresList.innerHTML = '';
+
+                    const featuresArray = features.split('\n').filter(f => f.trim() !== '');
+                    featuresArray.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.textContent = feature.trim();
+                        featuresList.appendChild(li);
+                    });
+                } else {
+                    document.getElementById('preview_features_container').style.display = 'none';
+                }
+
+                // Smooth scroll to preview
+                setTimeout(() => {
+                    packagePreview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                // Hide preview
+                packagePreview.style.display = 'none';
+            }
+        });
+    }
+
     // Real-time validation
     const form = document.getElementById('modernBookingForm');
     const nameInput = form.querySelector('input[name="client_name"]');
@@ -949,21 +1049,45 @@ $social_youtube = getSetting('social_youtube', '');
             const data = await response.json();
 
             if (data.success) {
-                alert(data.message);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم إرسال الحجز بنجاح!',
+                    text: data.message,
+                    confirmButtonText: 'حسناً',
+                    confirmButtonColor: '#0ea5e9',
+                    timer: 5000,
+                    timerProgressBar: true
+                });
                 this.reset();
                 // Remove all validation classes
                 this.querySelectorAll('.error, .success').forEach(el => {
                     el.classList.remove('error', 'success');
                 });
                 this.querySelectorAll('.error-message').forEach(el => el.remove());
+                // Hide package preview
+                if (packagePreview) {
+                    packagePreview.style.display = 'none';
+                }
             } else {
-                alert(data.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'حدث خطأ!',
+                    text: data.message,
+                    confirmButtonText: 'حسناً',
+                    confirmButtonColor: '#ef4444'
+                });
                 if (data.debug) {
                     console.error('Debug:', data.debug);
                 }
             }
         } catch (error) {
-            alert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ في الاتصال',
+                text: 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#ef4444'
+            });
             console.error('Error:', error);
         } finally {
             submitBtn.disabled = false;
@@ -1158,6 +1282,9 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
         </div>
     </footer>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- International Telephone Input JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/intlTelInput.min.js"></script>

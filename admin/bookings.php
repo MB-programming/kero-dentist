@@ -155,6 +155,7 @@ $bookings = $stmt->fetchAll();
                         <th>واتساب</th>
                         <th>الباقة</th>
                         <th>التاريخ</th>
+                        <th>الوقت</th>
                         <th>اليوم</th>
                         <th>الحالة</th>
                         <th>الإجراءات</th>
@@ -173,6 +174,7 @@ $bookings = $stmt->fetchAll();
                             <small style="color: var(--text-light);"><?php echo formatPrice($booking['price']); ?></small>
                         </td>
                         <td><?php echo formatDate($booking['booking_date']); ?></td>
+                        <td><?php echo htmlspecialchars($booking['booking_time'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($booking['booking_day']); ?></td>
                         <td>
                             <?php
@@ -200,18 +202,18 @@ $bookings = $stmt->fetchAll();
                         <td>
                             <div style="display: flex; gap: 5px; flex-wrap: wrap;">
                                 <?php if ($booking['status'] === 'pending'): ?>
-                                <button onclick="quickApprove(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-success" title="موافقة سريعة">
-                                    <i class="fas fa-check"></i>
+                                <button onclick="approveBookingWhatsApp(<?php echo json_encode($booking); ?>)" class="btn btn-sm btn-success" title="موافقة + واتساب">
+                                    <i class="fab fa-whatsapp"></i> قبول
                                 </button>
-                                <button onclick="quickReject(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-danger" title="رفض سريع">
-                                    <i class="fas fa-times"></i>
+                                <button onclick="rejectBookingWhatsApp(<?php echo json_encode($booking); ?>)" class="btn btn-sm btn-danger" title="رفض + واتساب">
+                                    <i class="fab fa-whatsapp"></i> رفض
                                 </button>
                                 <?php endif; ?>
+                                <button onclick="contactWhatsApp('<?php echo htmlspecialchars($booking['client_whatsapp']); ?>', '<?php echo htmlspecialchars($booking['client_name']); ?>')" class="btn btn-sm" style="background: #25D366; color: white;" title="تواصل واتساب">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
                                 <button onclick="viewBooking(<?php echo $booking['id']; ?>)" class="btn btn-sm btn-primary" title="عرض التفاصيل">
                                     <i class="fas fa-eye"></i>
-                                </button>
-                                <button onclick="openWhatsAppModal('<?php echo htmlspecialchars($booking['client_whatsapp']); ?>', '<?php echo htmlspecialchars($booking['client_name']); ?>', <?php echo $booking['id']; ?>)" class="btn btn-sm btn-success" title="إرسال واتساب">
-                                    <i class="fab fa-whatsapp"></i>
                                 </button>
                                 <button onclick="updateStatus(<?php echo $booking['id']; ?>, '<?php echo $booking['status']; ?>')" class="btn btn-sm btn-warning" title="تحديث الحالة">
                                     <i class="fas fa-edit"></i>
@@ -390,6 +392,7 @@ function viewBooking(id) {
                         <tr><td style="padding: 10px; font-weight: bold;">الباقة:</td><td style="padding: 10px;">${booking.package_name}</td></tr>
                         <tr><td style="padding: 10px; font-weight: bold;">السعر:</td><td style="padding: 10px;">${booking.price} جنيه</td></tr>
                         <tr><td style="padding: 10px; font-weight: bold;">تاريخ الحجز:</td><td style="padding: 10px;">${booking.booking_date}</td></tr>
+                        ${booking.booking_time ? `<tr><td style="padding: 10px; font-weight: bold;">وقت الحجز:</td><td style="padding: 10px;">${booking.booking_time}</td></tr>` : ''}
                         <tr><td style="padding: 10px; font-weight: bold;">اليوم:</td><td style="padding: 10px;">${booking.booking_day}</td></tr>
                         <tr><td style="padding: 10px; font-weight: bold;">الحالة:</td><td style="padding: 10px;">${booking.status}</td></tr>
                         ${booking.notes ? `<tr><td style="padding: 10px; font-weight: bold;">ملاحظات:</td><td style="padding: 10px;">${booking.notes}</td></tr>` : ''}
@@ -411,6 +414,70 @@ function deleteBooking(id) {
     if (confirm('هل أنت متأكد من حذف هذا الحجز؟')) {
         window.location.href = 'bookings.php?delete=' + id;
     }
+}
+
+// WhatsApp Functions
+function approveBookingWhatsApp(booking) {
+    if (!confirm('هل تريد الموافقة على هذا الحجز وإرسال رسالة واتساب؟')) {
+        return;
+    }
+
+    // Update status to approved
+    const formData = new FormData();
+    formData.append('booking_id', booking.id);
+    formData.append('status', 'approved');
+    formData.append('update_status', '1');
+
+    fetch('bookings.php', {
+        method: 'POST',
+        body: formData
+    }).then(() => {
+        // Build WhatsApp approval message
+        const message = `مرحباً ${booking.client_name}،\n\n✅ تم الموافقة على حجزك!\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n💰 السعر: ${booking.price} جنيه\n📅 التاريخ: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n✨ نحن سعداء بخدمتك!\nيُرجى الحضور في الموعد المحدد.\n\nمع تحياتنا،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
+
+        // Clean phone number and open WhatsApp
+        const cleanNumber = booking.client_whatsapp.replace(/[^0-9]/g, '');
+        const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+
+        // Reload page after a short delay
+        setTimeout(() => location.reload(), 1000);
+    });
+}
+
+function rejectBookingWhatsApp(booking) {
+    if (!confirm('هل تريد رفض هذا الحجز وإرسال رسالة واتساب؟')) {
+        return;
+    }
+
+    // Update status to rejected
+    const formData = new FormData();
+    formData.append('booking_id', booking.id);
+    formData.append('status', 'rejected');
+    formData.append('update_status', '1');
+
+    fetch('bookings.php', {
+        method: 'POST',
+        body: formData
+    }).then(() => {
+        // Build WhatsApp rejection message
+        const message = `مرحباً ${booking.client_name}،\n\n❌ نأسف لإبلاغك بأن حجزك قد تم رفضه.\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n📅 التاريخ المطلوب: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n💡 يمكنك اختيار موعد آخر من خلال موقعنا الإلكتروني.\n\nنعتذر عن الإزعاج،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
+
+        // Clean phone number and open WhatsApp
+        const cleanNumber = booking.client_whatsapp.replace(/[^0-9]/g, '');
+        const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+
+        // Reload page after a short delay
+        setTimeout(() => location.reload(), 1000);
+    });
+}
+
+function contactWhatsApp(phone, name) {
+    // Clean phone number and open WhatsApp without message
+    const cleanNumber = phone.replace(/[^0-9]/g, '');
+    const url = `https://wa.me/${cleanNumber}`;
+    window.open(url, '_blank');
 }
 
 function openModal(id) {
