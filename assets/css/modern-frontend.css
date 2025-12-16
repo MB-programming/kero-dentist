@@ -51,10 +51,64 @@ body {
 }
 
 .modern-navbar .container {
+    padding: 16px 20px;
+}
+
+.modern-nav-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    width: 100%;
+    gap: 20px;
+}
+
+.modern-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.modern-social-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.modern-social-icons a {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-light);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.modern-social-icons a:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.modern-social-icons a:nth-child(1):hover {
+    background: #1877f2; /* Facebook */
+}
+
+.modern-social-icons a:nth-child(2):hover {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram */
+}
+
+.modern-social-icons a:nth-child(3):hover {
+    background: #1da1f2; /* Twitter */
+}
+
+.modern-social-icons a:nth-child(4):hover {
+    background: #ff0000; /* YouTube */
 }
 
 .modern-logo {
@@ -249,6 +303,194 @@ body {
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-20px); }
+}
+
+/* Hero Slider */
+.hero-slider-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.hero-slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 600px;
+}
+
+.hero-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+}
+
+.hero-slide-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.7), rgba(16, 185, 129, 0.6));
+    z-index: 1;
+}
+
+.hero-slide-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 800px;
+    padding: 40px 0;
+    animation: slideInRight 1s ease;
+}
+
+.hero-slide.active .hero-slide-content {
+    animation: slideInRight 1s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.hero-slide-title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.hero-slide-subtitle {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 30px;
+    line-height: 1.6;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.hero-slide-btn {
+    padding: 16px 40px;
+    background: white;
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.hero-slide-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    background: var(--accent);
+    color: white;
+}
+
+.hero-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hero-slider-nav:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.hero-slider-prev {
+    right: 30px;
+}
+
+.hero-slider-next {
+    left: 30px;
+}
+
+.hero-slider-dots {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 12px;
+}
+
+.hero-slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+}
+
+.hero-slider-dot:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+.hero-slider-dot.active {
+    background: white;
+    transform: scale(1.3);
 }
 
 /* Features Section */
@@ -453,6 +695,55 @@ body {
 .modern-textarea {
     resize: vertical;
     min-height: 120px;
+}
+
+/* Form Validation Styles */
+.modern-input.error,
+.modern-select.error,
+.modern-textarea.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.modern-input.error:focus,
+.modern-select.error:focus,
+.modern-textarea.error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.modern-input.success,
+.modern-select.success,
+.modern-textarea.success {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.modern-input.success:focus,
+.modern-select.success:focus,
+.modern-textarea.success:focus {
+    border-color: #059669;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.error-message {
+    display: block;
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Doctors Slider */
@@ -713,6 +1004,48 @@ body {
 
     .modern-hamburger {
         display: flex;
+    }
+
+    .modern-social-icons {
+        gap: 6px;
+    }
+
+    .modern-social-icons a {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    /* Hero Slider Responsive */
+    .hero-slider-wrapper {
+        height: 500px;
+    }
+
+    .hero-slide-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-slide-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .hero-slide-btn {
+        padding: 12px 28px;
+        font-size: 16px;
+    }
+
+    .hero-slider-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .hero-slider-prev {
+        right: 15px;
+    }
+
+    .hero-slider-next {
+        left: 15px;
     }
 
     .modern-hero-text h1 {

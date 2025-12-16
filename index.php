@@ -2,9 +2,9 @@
 require_once 'includes/config.php';
 
 // Fetch active sliders
-$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC LIMIT 1");
+$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC");
 $stmt->execute();
-$hero_slider = $stmt->fetch();
+$hero_sliders = $stmt->fetchAll();
 
 // Fetch active services
 $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
@@ -39,6 +39,10 @@ $hero_btn_secondary = getSetting('hero_btn_secondary', 'اعرف المزيد');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
 $site_address = getSetting('site_address', 'القاهرة، مصر');
+$social_facebook = getSetting('social_facebook', '');
+$social_instagram = getSetting('social_instagram', '');
+$social_twitter = getSetting('social_twitter', '');
+$social_youtube = getSetting('social_youtube', '');
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -65,33 +69,106 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
     <!-- Modern Navbar -->
     <nav class="modern-navbar">
         <div class="container">
-            <a href="index.php" class="modern-logo">
-                <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
-                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
-                <?php else: ?>
-                    <i class="fas fa-tooth"></i>
-                    <span><?php echo htmlspecialchars($site_name); ?></span>
-                <?php endif; ?>
-            </a>
+            <div class="modern-nav-content">
+                <a href="index.php" class="modern-logo">
+                    <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
+                    <?php else: ?>
+                        <i class="fas fa-tooth"></i>
+                        <span><?php echo htmlspecialchars($site_name); ?></span>
+                    <?php endif; ?>
+                </a>
 
-            <ul class="modern-nav-menu" id="modernNavMenu">
-                <li><a href="#home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
-                <li><a href="#about"><i class="fas fa-user-md"></i> من نحن</a></li>
-                <li><a href="#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
-                <li><a href="#packages"><i class="fas fa-box"></i> الباقات</a></li>
-                <li><a href="#reviews"><i class="fas fa-star"></i> آراء العملاء</a></li>
-                <li><a href="#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
-            </ul>
+                <ul class="modern-nav-menu" id="modernNavMenu">
+                    <li><a href="#home" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><a href="#about"><i class="fas fa-user-md"></i> من نحن</a></li>
+                    <li><a href="#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
+                    <li><a href="#packages"><i class="fas fa-box"></i> الباقات</a></li>
+                    <li><a href="#reviews"><i class="fas fa-star"></i> آراء العملاء</a></li>
+                    <li><a href="#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
+                </ul>
 
-            <div class="modern-hamburger" id="modernHamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+                <div class="modern-nav-actions">
+                    <div class="modern-social-icons">
+                        <?php if (!empty($social_facebook)): ?>
+                            <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank" rel="noopener" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_instagram)): ?>
+                            <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank" rel="noopener" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_twitter)): ?>
+                            <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank" rel="noopener" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_youtube)): ?>
+                            <a href="<?php echo htmlspecialchars($social_youtube); ?>" target="_blank" rel="noopener" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="modern-hamburger" id="modernHamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Modern Hero -->
+    <!-- Modern Hero Slider -->
+    <?php if (count($hero_sliders) > 0): ?>
+    <section id="home" class="hero-slider-section">
+        <div class="hero-slider-wrapper">
+            <div class="hero-slider" id="heroSlider">
+                <?php foreach ($hero_sliders as $index => $slider): ?>
+                <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>">
+                    <div class="hero-slide-bg" style="background-image: url('<?php echo UPLOAD_URL . htmlspecialchars($slider['image']); ?>');"></div>
+                    <div class="hero-slide-overlay"></div>
+                    <div class="container">
+                        <div class="hero-slide-content">
+                            <h1 class="hero-slide-title"><?php echo htmlspecialchars($slider['title']); ?></h1>
+                            <?php if (!empty($slider['subtitle'])): ?>
+                            <p class="hero-slide-subtitle"><?php echo htmlspecialchars($slider['subtitle']); ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($slider['button_text']) && !empty($slider['button_link'])): ?>
+                            <a href="<?php echo htmlspecialchars($slider['button_link']); ?>" class="hero-slide-btn">
+                                <i class="fas fa-calendar-check"></i>
+                                <?php echo htmlspecialchars($slider['button_text']); ?>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if (count($hero_sliders) > 1): ?>
+            <!-- Slider Navigation -->
+            <button class="hero-slider-nav hero-slider-prev" onclick="changeHeroSlide(-1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="hero-slider-nav hero-slider-next" onclick="changeHeroSlide(1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <!-- Slider Dots -->
+            <div class="hero-slider-dots" id="heroSliderDots">
+                <?php foreach ($hero_sliders as $index => $slider): ?>
+                <span class="hero-slider-dot <?php echo $index === 0 ? 'active' : ''; ?>" onclick="goToHeroSlide(<?php echo $index; ?>)"></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </section>
+    <?php else: ?>
+    <!-- Fallback Hero Section -->
     <section id="home" class="modern-hero">
         <div class="container">
             <div class="modern-hero-content">
@@ -116,15 +193,12 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
                     </div>
                 </div>
                 <div class="modern-hero-image">
-                    <?php if ($hero_slider && !empty($hero_slider['image'])): ?>
-                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($hero_slider['image']); ?>" alt="Hero">
-                    <?php else: ?>
-                        <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=800" alt="Dental Care">
-                    <?php endif; ?>
+                    <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=800" alt="Dental Care">
                 </div>
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <!-- Features Section -->
     <section id="about" class="modern-section" style="background: white;">
@@ -539,9 +613,231 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
         });
     });
 
+    // Form Validation Functions
+    function showError(input, message) {
+        const formGroup = input.closest('.modern-form-group');
+        let errorDiv = formGroup.querySelector('.error-message');
+
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            formGroup.appendChild(errorDiv);
+        }
+
+        errorDiv.textContent = message;
+        input.classList.add('error');
+        input.classList.remove('success');
+    }
+
+    function showSuccess(input) {
+        const formGroup = input.closest('.modern-form-group');
+        const errorDiv = formGroup.querySelector('.error-message');
+
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+
+        input.classList.remove('error');
+        input.classList.add('success');
+    }
+
+    function validateName(name) {
+        if (!name || name.trim().length < 3) {
+            return 'الاسم يجب أن يحتوي على 3 أحرف على الأقل';
+        }
+        if (!/^[\u0600-\u06FFa-zA-Z\s]+$/.test(name)) {
+            return 'الاسم يجب أن يحتوي على حروف فقط';
+        }
+        return null;
+    }
+
+    function validatePhone(phone) {
+        if (!phone || phone.trim() === '') {
+            return 'رقم الهاتف مطلوب';
+        }
+
+        // Remove spaces and special characters
+        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+
+        // Egyptian phone format: 11 digits starting with 01
+        if (!/^01[0-2,5]{1}[0-9]{8}$/.test(cleanPhone)) {
+            return 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 01 ويحتوي على 11 رقم)';
+        }
+
+        return null;
+    }
+
+    function validateEmail(email) {
+        if (!email || email.trim() === '') {
+            return null; // Email is optional
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return 'البريد الإلكتروني غير صحيح';
+        }
+
+        return null;
+    }
+
+    function validateDate(date) {
+        if (!date) {
+            return 'تاريخ الحجز مطلوب';
+        }
+
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            return 'لا يمكن اختيار تاريخ في الماضي';
+        }
+
+        // Check if date is within 3 months
+        const threeMonthsLater = new Date();
+        threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
+        if (selectedDate > threeMonthsLater) {
+            return 'يجب أن يكون التاريخ خلال 3 أشهر من اليوم';
+        }
+
+        return null;
+    }
+
+    function validatePackage(packageId) {
+        if (!packageId || packageId === '') {
+            return 'يجب اختيار باقة';
+        }
+        return null;
+    }
+
+    // Real-time validation
+    const form = document.getElementById('modernBookingForm');
+    const nameInput = form.querySelector('input[name="client_name"]');
+    const phoneInput = form.querySelector('input[name="client_phone"]');
+    const whatsappInput = form.querySelector('input[name="client_whatsapp"]');
+    const emailInput = form.querySelector('input[name="client_email"]');
+    const dateInput = form.querySelector('input[name="booking_date"]');
+    const packageSelect = form.querySelector('select[name="package_id"]');
+
+    // Add blur validation
+    nameInput.addEventListener('blur', function() {
+        const error = validateName(this.value);
+        if (error) {
+            showError(this, error);
+        } else {
+            showSuccess(this);
+        }
+    });
+
+    phoneInput.addEventListener('blur', function() {
+        const error = validatePhone(this.value);
+        if (error) {
+            showError(this, error);
+        } else {
+            showSuccess(this);
+        }
+    });
+
+    whatsappInput.addEventListener('blur', function() {
+        const error = validatePhone(this.value);
+        if (error) {
+            showError(this, error);
+        } else {
+            showSuccess(this);
+        }
+    });
+
+    emailInput.addEventListener('blur', function() {
+        const error = validateEmail(this.value);
+        if (error) {
+            showError(this, error);
+        } else if (this.value.trim() !== '') {
+            showSuccess(this);
+        }
+    });
+
+    dateInput.addEventListener('change', function() {
+        const error = validateDate(this.value);
+        if (error) {
+            showError(this, error);
+        } else {
+            showSuccess(this);
+        }
+    });
+
+    packageSelect.addEventListener('change', function() {
+        const error = validatePackage(this.value);
+        if (error) {
+            showError(this, error);
+        } else {
+            showSuccess(this);
+        }
+    });
+
     // Booking form submission
     document.getElementById('modernBookingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+
+        // Validate all fields
+        let isValid = true;
+
+        const nameError = validateName(nameInput.value);
+        if (nameError) {
+            showError(nameInput, nameError);
+            isValid = false;
+        } else {
+            showSuccess(nameInput);
+        }
+
+        const phoneError = validatePhone(phoneInput.value);
+        if (phoneError) {
+            showError(phoneInput, phoneError);
+            isValid = false;
+        } else {
+            showSuccess(phoneInput);
+        }
+
+        const whatsappError = validatePhone(whatsappInput.value);
+        if (whatsappError) {
+            showError(whatsappInput, whatsappError);
+            isValid = false;
+        } else {
+            showSuccess(whatsappInput);
+        }
+
+        const emailError = validateEmail(emailInput.value);
+        if (emailError) {
+            showError(emailInput, emailError);
+            isValid = false;
+        } else if (emailInput.value.trim() !== '') {
+            showSuccess(emailInput);
+        }
+
+        const dateError = validateDate(dateInput.value);
+        if (dateError) {
+            showError(dateInput, dateError);
+            isValid = false;
+        } else {
+            showSuccess(dateInput);
+        }
+
+        const packageError = validatePackage(packageSelect.value);
+        if (packageError) {
+            showError(packageSelect, packageError);
+            isValid = false;
+        } else {
+            showSuccess(packageSelect);
+        }
+
+        if (!isValid) {
+            // Scroll to first error
+            const firstError = this.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
 
         const formData = new FormData(this);
         const submitBtn = this.querySelector('button[type="submit"]');
@@ -561,6 +857,11 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
             if (data.success) {
                 alert(data.message);
                 this.reset();
+                // Remove all validation classes
+                this.querySelectorAll('.error, .success').forEach(el => {
+                    el.classList.remove('error', 'success');
+                });
+                this.querySelectorAll('.error-message').forEach(el => el.remove());
             } else {
                 alert(data.message);
                 if (data.debug) {
@@ -575,6 +876,55 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
             submitBtn.innerHTML = originalText;
         }
     });
+
+    // Hero Slider
+    let currentHeroSlide = 0;
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    const totalHeroSlides = heroSlides.length;
+
+    if (totalHeroSlides > 0) {
+        // Auto-play hero slider
+        let heroSliderInterval = setInterval(() => {
+            changeHeroSlide(1);
+        }, 5000); // Change slide every 5 seconds
+
+        function changeHeroSlide(direction) {
+            // Remove active class from current slide
+            heroSlides[currentHeroSlide].classList.remove('active');
+
+            // Update dots
+            const dots = document.querySelectorAll('.hero-slider-dot');
+            if (dots.length > 0) {
+                dots[currentHeroSlide].classList.remove('active');
+            }
+
+            // Calculate new slide index
+            currentHeroSlide = (currentHeroSlide + direction + totalHeroSlides) % totalHeroSlides;
+
+            // Add active class to new slide
+            heroSlides[currentHeroSlide].classList.add('active');
+
+            // Update dots
+            if (dots.length > 0) {
+                dots[currentHeroSlide].classList.add('active');
+            }
+
+            // Reset auto-play timer
+            clearInterval(heroSliderInterval);
+            heroSliderInterval = setInterval(() => {
+                changeHeroSlide(1);
+            }, 5000);
+        }
+
+        function goToHeroSlide(index) {
+            const direction = index - currentHeroSlide;
+            changeHeroSlide(direction);
+        }
+
+        // Make functions global
+        window.changeHeroSlide = changeHeroSlide;
+        window.goToHeroSlide = goToHeroSlide;
+    }
 
     // Doctors Slider
     let currentSlide = 0;
@@ -636,26 +986,23 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
                     </h3>
                     <p class="footer-text"><?php echo htmlspecialchars($doctor_bio); ?></p>
                     <div class="footer-social">
-                        <?php
-                        $facebook = getSetting('social_facebook', '');
-                        $instagram = getSetting('social_instagram', '');
-                        $twitter = getSetting('social_twitter', '');
-                        $youtube = getSetting('social_youtube', '');
-
-                        if ($facebook): ?>
-                        <a href="<?php echo htmlspecialchars($facebook); ?>" target="_blank" class="social-icon">
+                        <?php if (!empty($social_facebook)): ?>
+                        <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank" rel="noopener" class="social-icon" title="Facebook">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <?php endif; if ($instagram): ?>
-                        <a href="<?php echo htmlspecialchars($instagram); ?>" target="_blank" class="social-icon">
+                        <?php endif; ?>
+                        <?php if (!empty($social_instagram)): ?>
+                        <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank" rel="noopener" class="social-icon" title="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <?php endif; if ($twitter): ?>
-                        <a href="<?php echo htmlspecialchars($twitter); ?>" target="_blank" class="social-icon">
+                        <?php endif; ?>
+                        <?php if (!empty($social_twitter)): ?>
+                        <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank" rel="noopener" class="social-icon" title="Twitter">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <?php endif; if ($youtube): ?>
-                        <a href="<?php echo htmlspecialchars($youtube); ?>" target="_blank" class="social-icon">
+                        <?php endif; ?>
+                        <?php if (!empty($social_youtube)): ?>
+                        <a href="<?php echo htmlspecialchars($social_youtube); ?>" target="_blank" rel="noopener" class="social-icon" title="YouTube">
                             <i class="fab fa-youtube"></i>
                         </a>
                         <?php endif; ?>
