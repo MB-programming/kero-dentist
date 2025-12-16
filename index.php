@@ -414,6 +414,53 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
         </div>
     </section>
 
+    <!-- Reviews Section -->
+    <section id="reviews" class="modern-section" style="background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);">
+        <div class="container">
+            <div class="modern-section-header">
+                <span class="modern-section-badge">آراء العملاء</span>
+                <h2 class="modern-section-title">ماذا يقول عملاؤنا</h2>
+                <p class="modern-section-subtitle">تجارب حقيقية من عملاء سعداء بخدماتنا</p>
+            </div>
+
+            <?php if (count($reviews) > 0): ?>
+            <div class="reviews-grid">
+                <?php foreach ($reviews as $review): ?>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="review-info">
+                            <h4 class="review-name"><?php echo htmlspecialchars($review['client_name']); ?></h4>
+                            <div class="review-rating">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <?php if ($i <= $review['rating']): ?>
+                                        <i class="fas fa-star"></i>
+                                    <?php else: ?>
+                                        <i class="far fa-star"></i>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"<?php echo htmlspecialchars($review['review_text']); ?>"</p>
+                    <div class="review-footer">
+                        <i class="fas fa-check-circle"></i>
+                        <span>عميل معتمد</span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <p>لا توجد تقييمات حالياً</p>
+            </div>
+            <?php endif; ?>
+        </div>
+    </section>
+
     <!-- Booking Section -->
     <section id="booking" class="modern-section">
         <div class="container">
