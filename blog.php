@@ -22,7 +22,26 @@ $stmt = $conn->prepare("
 $stmt->execute([$per_page, $offset]);
 $blog_posts = $stmt->fetchAll();
 
-$site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
+// Fetch menu items
+$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
+$stmt->execute();
+$header_menu = $stmt->fetchAll();
+
+$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'footer' ORDER BY display_order ASC");
+$stmt->execute();
+$footer_menu = $stmt->fetchAll();
+
+// Get site settings
+$site_name = getSetting('site_name', 'عيادة الدكتور');
+$site_logo = getSetting('site_logo', '');
+$doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً في مجال طب الأسنان');
+$site_phone = getSetting('site_phone', '+20 123 456 7890');
+$site_email = getSetting('site_email', 'info@example.com');
+$site_address = getSetting('site_address', 'القاهرة، مصر');
+$social_facebook = getSetting('social_facebook', '');
+$social_instagram = getSetting('social_instagram', '');
+$social_twitter = getSetting('social_twitter', '');
+$social_youtube = getSetting('social_youtube', '');
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -30,45 +49,254 @@ $site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المدونة - <?php echo htmlspecialchars($site_name); ?></title>
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/main.css">
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .blog-hero {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.95), rgba(6, 214, 160, 0.95));
+            color: white;
+            padding: 5rem 0 3rem;
+            text-align: center;
+        }
+
+        .blog-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .blog-hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+            margin-top: 50px;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .blog-card:hover .blog-image img {
+            transform: scale(1.1);
+        }
+
+        .blog-content {
+            padding: 28px;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .blog-meta i {
+            color: var(--primary);
+        }
+
+        .blog-card h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .blog-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            gap: 12px;
+            color: var(--primary-dark);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a, .pagination span {
+            min-width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .pagination a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .pagination span {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .blog-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation (same as index.php) -->
-    <nav class="navbar" id="navbar">
+    <!-- Modern Navbar -->
+    <nav class="modern-navbar">
         <div class="container">
-            <div class="nav-brand">
-                <i class="fas fa-tooth"></i>
-                <span><?php echo htmlspecialchars($site_name); ?></span>
-            </div>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">الرئيسية</a></li>
-                <li><a href="index.php#about">عن الدكتور</a></li>
-                <li><a href="index.php#services">الخدمات</a></li>
-                <li><a href="index.php#packages">الباقات</a></li>
-                <li><a href="blog.php">المقالات</a></li>
-                <li><a href="index.php#reviews">آراء العملاء</a></li>
-                <li><a href="index.php#booking" class="btn-nav">احجز الآن</a></li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="modern-nav-content">
+                <a href="doctor.php" class="modern-logo">
+                    <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
+                    <?php else: ?>
+                        <i class="fas fa-tooth"></i>
+                        <span><?php echo htmlspecialchars($site_name); ?></span>
+                    <?php endif; ?>
+                </a>
+
+                <ul class="modern-nav-menu" id="modernNavMenu">
+                    <?php if (count($header_menu) > 0): ?>
+                        <?php foreach ($header_menu as $item): ?>
+                            <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li><a href="doctor.php"><i class="fas fa-home"></i> الرئيسية</a></li>
+                        <li><a href="doctor.php#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
+                        <li><a href="doctor.php#packages"><i class="fas fa-box"></i> الباقات</a></li>
+                        <li><a href="blog.php" class="active"><i class="fas fa-blog"></i> المدونة</a></li>
+                        <li><a href="doctor.php#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
+                    <?php endif; ?>
+                </ul>
+
+                <div class="modern-nav-actions">
+                    <div class="modern-social-icons">
+                        <?php if (!empty($social_facebook)): ?>
+                            <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank" rel="noopener" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_instagram)): ?>
+                            <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank" rel="noopener" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_twitter)): ?>
+                            <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank" rel="noopener" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_youtube)): ?>
+                            <a href="<?php echo htmlspecialchars($social_youtube); ?>" target="_blank" rel="noopener" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="modern-hamburger" id="modernHamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Page Header -->
-    <div style="height: 70px;"></div>
-    <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; padding: 60px 20px; text-align: center; margin-top: 70px;">
+    <!-- Blog Hero -->
+    <section class="blog-hero">
         <div class="container">
-            <h1 style="font-size: 2.5rem; margin-bottom: 15px;">مدونتنا الطبية</h1>
-            <p style="font-size: 1.2rem; opacity: 0.9;">آخر المقالات والنصائح الطبية</p>
+            <h1>مدونتنا الطبية</h1>
+            <p>آخر المقالات والنصائح الطبية</p>
         </div>
     </section>
 
     <!-- Blog Posts -->
-    <section class="blog" style="background: var(--bg-white);">
+    <section class="modern-section" style="background: var(--bg-light);">
         <div class="container">
             <?php if (count($blog_posts) > 0): ?>
                 <div class="blog-grid">
@@ -88,7 +316,9 @@ $site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
                             </div>
                             <h3><?php echo htmlspecialchars($post['title']); ?></h3>
                             <p><?php echo htmlspecialchars($post['excerpt']); ?></p>
-                            <a href="blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" class="read-more">اقرأ المزيد <i class="fas fa-arrow-left"></i></a>
+                            <a href="blog-post.php?slug=<?php echo urlencode($post['slug']); ?>" class="read-more">
+                                اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                            </a>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -96,67 +326,129 @@ $site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
 
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>
-                <div class="pagination" style="display: flex; justify-content: center; gap: 10px; margin-top: 40px;">
+                <div class="pagination">
                     <?php if ($page > 1): ?>
-                    <a href="?page=<?php echo $page - 1; ?>" class="btn btn-outline" style="border-color: var(--primary-color); color: var(--primary-color);">السابق</a>
+                    <a href="?page=<?php echo $page - 1; ?>">السابق</a>
                     <?php endif; ?>
 
                     <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                         <?php if ($i == $page): ?>
-                        <span class="btn btn-primary"><?php echo $i; ?></span>
+                        <span><?php echo $i; ?></span>
                         <?php else: ?>
-                        <a href="?page=<?php echo $i; ?>" class="btn btn-outline" style="border-color: var(--primary-color); color: var(--primary-color);"><?php echo $i; ?></a>
+                        <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                         <?php endif; ?>
                     <?php endfor; ?>
 
                     <?php if ($page < $total_pages): ?>
-                    <a href="?page=<?php echo $page + 1; ?>" class="btn btn-outline" style="border-color: var(--primary-color); color: var(--primary-color);">التالي</a>
+                    <a href="?page=<?php echo $page + 1; ?>">التالي</a>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
             <?php else: ?>
-                <div style="text-align: center; padding: 60px 20px;">
-                    <i class="fas fa-newspaper" style="font-size: 4rem; color: var(--text-light); margin-bottom: 20px;"></i>
-                    <h3 style="color: var(--text-color); margin-bottom: 10px;">لا توجد مقالات حالياً</h3>
-                    <p style="color: var(--text-light);">تابعونا قريباً للحصول على آخر المقالات والنصائح الطبية</p>
+                <div class="empty-state">
+                    <i class="fas fa-newspaper"></i>
+                    <p>لا توجد مقالات حالياً</p>
                 </div>
             <?php endif; ?>
         </div>
     </section>
 
-    <!-- Footer (same as index.php) -->
-    <footer class="footer">
+    <!-- Footer -->
+    <footer class="modern-footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <h3><?php echo htmlspecialchars($site_name); ?></h3>
-                    <p><?php echo htmlspecialchars(getSetting('doctor_bio', '')); ?></p>
-                </div>
-                <div class="footer-links">
-                    <h4>روابط سريعة</h4>
-                    <ul>
-                        <li><a href="index.php">الرئيسية</a></li>
-                        <li><a href="index.php#about">عن الدكتور</a></li>
-                        <li><a href="index.php#services">الخدمات</a></li>
-                        <li><a href="blog.php">المقالات</a></li>
-                    </ul>
-                </div>
-                <div class="footer-social">
-                    <h4>تواصل معنا</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                <div class="footer-section">
+                    <h3 class="footer-title">
+                        <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
+                            <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" style="height: 40px;">
+                        <?php else: ?>
+                            <i class="fas fa-tooth"></i> <?php echo htmlspecialchars($site_name); ?>
+                        <?php endif; ?>
+                    </h3>
+                    <p class="footer-text"><?php echo htmlspecialchars($doctor_bio); ?></p>
+                    <div class="footer-social">
+                        <?php if (!empty($social_facebook)): ?>
+                        <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank" rel="noopener" class="social-icon" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_instagram)): ?>
+                        <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank" rel="noopener" class="social-icon" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_twitter)): ?>
+                        <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank" rel="noopener" class="social-icon" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (!empty($social_youtube)): ?>
+                        <a href="<?php echo htmlspecialchars($social_youtube); ?>" target="_blank" rel="noopener" class="social-icon" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <?php endif; ?>
                     </div>
                 </div>
+
+                <div class="footer-section">
+                    <h3 class="footer-title">روابط سريعة</h3>
+                    <ul class="footer-links">
+                        <?php if (count($footer_menu) > 0): ?>
+                            <?php foreach ($footer_menu as $item): ?>
+                                <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><a href="doctor.php">الرئيسية</a></li>
+                            <li><a href="doctor.php#services">الخدمات</a></li>
+                            <li><a href="doctor.php#packages">الباقات</a></li>
+                            <li><a href="blog.php">المدونة</a></li>
+                            <li><a href="doctor.php#booking">احجز الآن</a></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3 class="footer-title">معلومات الاتصال</h3>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <?php echo htmlspecialchars($site_address); ?>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:<?php echo htmlspecialchars($site_phone); ?>"><?php echo htmlspecialchars($site_phone); ?></a>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:<?php echo htmlspecialchars($site_email); ?>"><?php echo htmlspecialchars($site_email); ?></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3 class="footer-title">ساعات العمل</h3>
+                    <ul class="footer-hours">
+                        <li><strong>السبت - الخميس:</strong> 9:00 ص - 9:00 م</li>
+                        <li><strong>الجمعة:</strong> مغلق</li>
+                    </ul>
+                    <a href="doctor.php#booking" class="modern-btn modern-btn-primary" style="margin-top: 20px;">
+                        <i class="fas fa-calendar-check"></i>
+                        احجز الآن
+                    </a>
+                </div>
             </div>
+
             <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. جميع الحقوق محفوظة.</p>
+                <p>© <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script>
+    // Mobile menu toggle
+    document.getElementById('modernHamburger').addEventListener('click', function() {
+        document.getElementById('modernNavMenu').classList.toggle('active');
+    });
+    </script>
 </body>
 </html>

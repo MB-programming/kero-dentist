@@ -1,6 +1,20 @@
 <?php
 require_once 'includes/config.php';
 
+// Fetch active sliders
+$stmt = $conn->prepare("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order ASC");
+$stmt->execute();
+$hero_sliders = $stmt->fetchAll();
+
+// Fetch active doctors
+try {
+    $stmt = $conn->prepare("SELECT * FROM doctors WHERE is_active = 1 ORDER BY display_order ASC");
+    $stmt->execute();
+    $doctors = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $doctors = [];
+}
+
 // Fetch active services
 $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
 $stmt->execute();
@@ -410,8 +424,55 @@ $social_youtube = getSetting('social_youtube', '');
         </div>
     </nav>
 
-    <!-- Doctor Hero -->
-    <section id="home" class="doctor-hero">
+    <!-- Hero Slider -->
+    <?php if (count($hero_sliders) > 0): ?>
+    <section class="hero-slider-section">
+        <div class="hero-slider-wrapper">
+            <div class="hero-slider" id="heroSlider">
+                <?php foreach ($hero_sliders as $index => $slider): ?>
+                <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>">
+                    <div class="hero-slide-bg" style="background-image: url('<?php echo UPLOAD_URL . htmlspecialchars($slider['image']); ?>');"></div>
+                    <div class="hero-slide-overlay"></div>
+                    <div class="container">
+                        <div class="hero-slide-content">
+                            <h1 class="hero-slide-title"><?php echo htmlspecialchars($slider['title']); ?></h1>
+                            <?php if (!empty($slider['subtitle'])): ?>
+                            <p class="hero-slide-subtitle"><?php echo htmlspecialchars($slider['subtitle']); ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($slider['button_text']) && !empty($slider['button_link'])): ?>
+                            <a href="<?php echo htmlspecialchars($slider['button_link']); ?>" class="hero-slide-btn">
+                                <i class="fas fa-calendar-check"></i>
+                                <?php echo htmlspecialchars($slider['button_text']); ?>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if (count($hero_sliders) > 1): ?>
+            <!-- Slider Navigation -->
+            <button class="hero-slider-nav hero-slider-prev" onclick="changeHeroSlide(-1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="hero-slider-nav hero-slider-next" onclick="changeHeroSlide(1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <!-- Slider Dots -->
+            <div class="hero-slider-dots" id="heroSliderDots">
+                <?php foreach ($hero_sliders as $index => $slider): ?>
+                <span class="hero-slider-dot <?php echo $index === 0 ? 'active' : ''; ?>" onclick="goToHeroSlide(<?php echo $index; ?>)"></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- Doctor Profile -->
+    <section id="doctor" class="doctor-hero">
         <div class="container">
             <div class="doctor-hero-content">
                 <div class="doctor-image-wrapper">
@@ -606,6 +667,104 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
         </div>
     </section>
+
+    <!-- Doctors Team Section -->
+    <?php if (count($doctors) > 0): ?>
+    <section id="doctors" class="modern-section" style="background: white;">
+        <div class="container">
+            <div class="modern-section-header">
+                <span class="modern-section-badge">فريقنا الطبي</span>
+                <h2 class="modern-section-title">تعرف على فريق الدكاترة</h2>
+                <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
+            </div>
+
+            <div class="doctors-slider-wrapper">
+                <div class="doctors-slider" id="doctorsSlider">
+                    <?php foreach ($doctors as $doctor): ?>
+                    <div class="doctor-card">
+                        <div class="doctor-card-inner">
+                            <div class="doctor-image-wrapper">
+                                <?php if (!empty($doctor['image'])): ?>
+                                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
+                                         alt="<?php echo htmlspecialchars($doctor['name']); ?>"
+                                         class="doctor-image">
+                                <?php else: ?>
+                                    <div class="doctor-image doctor-image-placeholder">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($doctor['years_experience'] > 0): ?>
+                                <div class="doctor-badge">
+                                    <i class="fas fa-award"></i>
+                                    <?php echo $doctor['years_experience']; ?> سنة خبرة
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="doctor-info">
+                                <h3 class="doctor-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
+                                <p class="doctor-title"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                                <p class="doctor-specialization">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <?php echo htmlspecialchars($doctor['specialization']); ?>
+                                </p>
+                                <p class="doctor-bio"><?php echo htmlspecialchars($doctor['bio']); ?></p>
+
+                                <?php if ($doctor['phone'] || $doctor['email']): ?>
+                                <div class="doctor-contact">
+                                    <?php if ($doctor['phone']): ?>
+                                    <a href="tel:<?php echo htmlspecialchars($doctor['phone']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['email']): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($doctor['email']); ?>" class="doctor-contact-btn">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if ($doctor['facebook'] || $doctor['instagram'] || $doctor['twitter']): ?>
+                                <div class="doctor-social">
+                                    <?php if ($doctor['facebook']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['instagram']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if ($doctor['twitter']): ?>
+                                    <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank" class="doctor-social-btn">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <?php if (count($doctors) > 1): ?>
+                <!-- Slider Navigation -->
+                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Slider Dots -->
+                <div class="slider-dots" id="sliderDots"></div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- Services Section -->
     <section id="services" class="modern-section">
@@ -1350,6 +1509,91 @@ $social_youtube = getSetting('social_youtube', '');
             submitBtn.innerHTML = originalText;
         }
     });
+
+    // Hero Slider
+    let currentHeroSlide = 0;
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    const totalHeroSlides = heroSlides.length;
+
+    if (totalHeroSlides > 0) {
+        // Auto-play hero slider
+        let heroSliderInterval = setInterval(() => {
+            changeHeroSlide(1);
+        }, 5000);
+
+        function changeHeroSlide(direction) {
+            heroSlides[currentHeroSlide].classList.remove('active');
+
+            const dots = document.querySelectorAll('.hero-slider-dot');
+            if (dots.length > 0) {
+                dots[currentHeroSlide].classList.remove('active');
+            }
+
+            currentHeroSlide = (currentHeroSlide + direction + totalHeroSlides) % totalHeroSlides;
+
+            heroSlides[currentHeroSlide].classList.add('active');
+
+            if (dots.length > 0) {
+                dots[currentHeroSlide].classList.add('active');
+            }
+
+            clearInterval(heroSliderInterval);
+            heroSliderInterval = setInterval(() => {
+                changeHeroSlide(1);
+            }, 5000);
+        }
+
+        function goToHeroSlide(index) {
+            const direction = index - currentHeroSlide;
+            changeHeroSlide(direction);
+        }
+
+        window.changeHeroSlide = changeHeroSlide;
+        window.goToHeroSlide = goToHeroSlide;
+    }
+
+    // Doctors Slider
+    let currentSlide = 0;
+    const doctorCards = document.querySelectorAll('.doctor-card');
+    const totalDoctors = doctorCards.length;
+    const dotsContainer = document.getElementById('sliderDots');
+
+    if (totalDoctors > 0 && dotsContainer) {
+        const totalPages = Math.ceil(totalDoctors / 3);
+        for (let i = 0; i < totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'slider-dot';
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateSlider() {
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = Math.max(0, Math.min(index, totalPages - 1));
+            updateSlider();
+        }
+
+        window.slideDoctors = function(direction) {
+            const totalPages = Math.ceil(totalDoctors / 3);
+            currentSlide = (currentSlide + direction + totalPages) % totalPages;
+            updateSlider();
+        };
+
+        // Auto-slide every 5 seconds
+        if (totalDoctors > 3) {
+            setInterval(() => {
+                slideDoctors(1);
+            }, 5000);
+        }
+    }
     </script>
 </body>
 </html>

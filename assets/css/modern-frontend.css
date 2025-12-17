@@ -1635,6 +1635,398 @@ body {
     margin: 0;
 }
 
+/* Hero Slider */
+.hero-slider-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-slider-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.hero-slider {
+    position: relative;
+    width: 100%;
+    height: 600px;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
+.hero-slide-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: kenburns 20s ease-out infinite;
+}
+
+.hero-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.85), rgba(16, 185, 129, 0.75));
+    z-index: 1;
+}
+
+.hero-slide-content {
+    position: relative;
+    z-index: 2;
+    padding: 150px 0;
+    text-align: center;
+    color: white;
+}
+
+.hero-slide-title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: slideInUp 1s ease-out;
+}
+
+.hero-slide-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    opacity: 0.95;
+    animation: slideInUp 1s ease-out 0.2s both;
+}
+
+.hero-slide-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 40px;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    animation: slideInUp 1s ease-out 0.4s both;
+}
+
+.hero-slide-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hero-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.hero-slider-nav:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.hero-slider-prev {
+    right: 30px;
+}
+
+.hero-slider-next {
+    left: 30px;
+}
+
+.hero-slider-dots {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 12px;
+}
+
+.hero-slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero-slider-dot.active {
+    background: white;
+    width: 40px;
+    border-radius: 6px;
+}
+
+/* Doctors Slider */
+.doctors-slider-wrapper {
+    position: relative;
+    padding: 0 60px;
+}
+
+.doctors-slider {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.doctor-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.doctor-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 20px 60px rgba(14, 165, 233, 0.15);
+}
+
+.doctor-card-inner {
+    position: relative;
+}
+
+.doctor-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+}
+
+.doctor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.doctor-card:hover .doctor-image {
+    transform: scale(1.1);
+}
+
+.doctor-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    color: white;
+    font-size: 5rem;
+}
+
+.doctor-badge {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(16, 185, 129, 0.95);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.doctor-info {
+    padding: 25px;
+}
+
+.doctor-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.doctor-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+}
+
+.doctor-specialization {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.doctor-specialization i {
+    color: var(--accent);
+}
+
+.doctor-bio {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.doctor-contact {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.doctor-contact-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.doctor-contact-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+}
+
+.doctor-social {
+    display: flex;
+    gap: 10px;
+}
+
+.doctor-social-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.doctor-social-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.slider-nav:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.slider-prev {
+    right: 0;
+}
+
+.slider-next {
+    left: 0;
+}
+
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.slider-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background: var(--primary);
+    width: 30px;
+    border-radius: 5px;
+}
+
+@keyframes kenburns {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1643,6 +2035,16 @@ body {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .doctors-slider {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero-slide-title {
+        font-size: 3rem;
     }
 }
 
@@ -1659,5 +2061,42 @@ body {
 
     .reviews-grid {
         grid-template-columns: 1fr;
+    }
+
+    .doctors-slider {
+        grid-template-columns: 1fr;
+    }
+
+    .doctors-slider-wrapper {
+        padding: 0 40px;
+    }
+
+    .hero-slider {
+        height: 500px;
+    }
+
+    .hero-slide-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-slide-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .hero-slide-content {
+        padding: 100px 0;
+    }
+
+    .hero-slider-nav {
+        width: 40px;
+        height: 40px;
+    }
+
+    .hero-slider-prev {
+        right: 15px;
+    }
+
+    .hero-slider-next {
+        left: 15px;
     }
 }
