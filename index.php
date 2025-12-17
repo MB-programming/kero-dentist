@@ -20,28 +20,48 @@ try {
 }
 
 // Fetch active services
-$stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
-$stmt->execute();
-$services = $stmt->fetchAll();
+try {
+    $stmt = $conn->prepare("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC");
+    $stmt->execute();
+    $services = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $services = [];
+}
 
 // Fetch active packages
-$stmt = $conn->prepare("SELECT * FROM packages WHERE is_active = 1 ORDER BY display_order ASC");
-$stmt->execute();
-$packages = $stmt->fetchAll();
+try {
+    $stmt = $conn->prepare("SELECT * FROM packages WHERE is_active = 1 ORDER BY display_order ASC");
+    $stmt->execute();
+    $packages = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $packages = [];
+}
 
 // Fetch approved reviews
-$stmt = $conn->prepare("SELECT * FROM reviews WHERE is_approved = 1 AND is_displayed = 1 ORDER BY created_at DESC LIMIT 6");
-$stmt->execute();
-$reviews = $stmt->fetchAll();
+try {
+    $stmt = $conn->prepare("SELECT * FROM reviews WHERE is_approved = 1 AND is_displayed = 1 ORDER BY created_at DESC LIMIT 6");
+    $stmt->execute();
+    $reviews = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $reviews = [];
+}
 
 // Fetch menu items
-$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
-$stmt->execute();
-$header_menu = $stmt->fetchAll();
+try {
+    $stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
+    $stmt->execute();
+    $header_menu = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $header_menu = [];
+}
 
-$stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'footer' ORDER BY display_order ASC");
-$stmt->execute();
-$footer_menu = $stmt->fetchAll();
+try {
+    $stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'footer' ORDER BY display_order ASC");
+    $stmt->execute();
+    $footer_menu = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $footer_menu = [];
+}
 
 // Get site settings
 $site_name = getSetting('site_name', 'عيادة الدكتور');
@@ -1592,18 +1612,44 @@ $social_youtube = getSetting('social_youtube', '');
     const doctorCards = document.querySelectorAll('.doctor-card');
     const totalDoctors = doctorCards.length;
     const dotsContainer = document.getElementById('sliderDots');
+    const doctorsSlider = document.getElementById('doctorsSlider');
 
-    if (totalDoctors > 0 && dotsContainer) {
-        const totalPages = Math.ceil(totalDoctors / 3);
-        for (let i = 0; i < totalPages; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'slider-dot';
-            if (i === 0) dot.classList.add('active');
-            dot.onclick = () => goToSlide(i);
-            dotsContainer.appendChild(dot);
+    if (totalDoctors > 0 && dotsContainer && doctorsSlider) {
+        // Calculate cards per slide based on screen width
+        function getCardsPerSlide() {
+            const width = window.innerWidth;
+            if (width <= 640) return 1;
+            if (width <= 1024) return 2;
+            return 3;
         }
 
+        let cardsPerSlide = getCardsPerSlide();
+        const totalPages = Math.ceil(totalDoctors / cardsPerSlide);
+
+        // Create dots
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            const pages = Math.ceil(totalDoctors / cardsPerSlide);
+            for (let i = 0; i < pages; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'slider-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.onclick = () => goToSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        createDots();
+
         function updateSlider() {
+            // Update slider position
+            const slideWidth = 100 / cardsPerSlide;
+            const offset = -currentSlide * 100;
+
+            // Apply transform to move the slider
+            doctorsSlider.style.transform = `translateX(${offset}%)`;
+
+            // Update dots
             const dots = document.querySelectorAll('.slider-dot');
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
@@ -1611,19 +1657,34 @@ $social_youtube = getSetting('social_youtube', '');
         }
 
         function goToSlide(index) {
-            const totalPages = Math.ceil(totalDoctors / 3);
-            currentSlide = Math.max(0, Math.min(index, totalPages - 1));
+            const pages = Math.ceil(totalDoctors / cardsPerSlide);
+            currentSlide = Math.max(0, Math.min(index, pages - 1));
             updateSlider();
         }
 
         window.slideDoctors = function(direction) {
-            const totalPages = Math.ceil(totalDoctors / 3);
-            currentSlide = (currentSlide + direction + totalPages) % totalPages;
+            const pages = Math.ceil(totalDoctors / cardsPerSlide);
+            currentSlide = (currentSlide + direction + pages) % pages;
             updateSlider();
         };
 
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                const newCardsPerSlide = getCardsPerSlide();
+                if (newCardsPerSlide !== cardsPerSlide) {
+                    cardsPerSlide = newCardsPerSlide;
+                    currentSlide = 0;
+                    createDots();
+                    updateSlider();
+                }
+            }, 250);
+        });
+
         // Auto-slide every 5 seconds
-        if (totalDoctors > 3) {
+        if (totalDoctors > cardsPerSlide) {
             setInterval(() => {
                 slideDoctors(1);
             }, 5000);

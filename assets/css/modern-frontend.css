@@ -1797,12 +1797,19 @@ body {
 .doctors-slider-wrapper {
     position: relative;
     padding: 0 60px;
+    overflow: hidden;
 }
 
 .doctors-slider {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     gap: 30px;
+    transition: transform 0.5s ease;
+    width: 100%;
+}
+
+.doctors-slider .doctor-card {
+    flex: 0 0 calc(33.333% - 20px);
+    min-width: calc(33.333% - 20px);
 }
 
 .doctor-card {
@@ -2039,8 +2046,9 @@ body {
 }
 
 @media (max-width: 1024px) {
-    .doctors-slider {
-        grid-template-columns: repeat(2, 1fr);
+    .doctors-slider .doctor-card {
+        flex: 0 0 calc(50% - 15px);
+        min-width: calc(50% - 15px);
     }
 
     .hero-slide-title {
@@ -2063,8 +2071,9 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .doctors-slider {
-        grid-template-columns: 1fr;
+    .doctors-slider .doctor-card {
+        flex: 0 0 100%;
+        min-width: 100%;
     }
 
     .doctors-slider-wrapper {
