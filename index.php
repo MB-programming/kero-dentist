@@ -476,45 +476,76 @@ $social_youtube = getSetting('social_youtube', '');
     <?php endif; ?>
 
     <!-- Doctor Profile -->
-    <section id="doctor" class="doctor-hero">
+    <section id="doctor" class="doctor-profile-modern">
         <div class="container">
-            <div class="doctor-hero-content">
-                <div class="doctor-image-wrapper">
-                    <?php if ($doctor_image && file_exists(UPLOAD_PATH . $doctor_image)): ?>
-                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor_image); ?>"
-                             alt="<?php echo htmlspecialchars($doctor_name); ?>"
-                             class="doctor-main-image"
-                             onerror="this.parentElement.innerHTML='<div class=\'doctor-main-image\' style=\'background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; aspect-ratio: 3/4;\'><i class=\'fas fa-user-md\' style=\'font-size: 8rem; color: rgba(255,255,255,0.3);\'></i></div>'">
-                    <?php else: ?>
-                        <div class="doctor-main-image" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; aspect-ratio: 3/4;">
-                            <i class="fas fa-user-md" style="font-size: 8rem; color: rgba(255,255,255,0.3);"></i>
+            <div class="doctor-profile-wrapper">
+                <!-- Doctor Card -->
+                <div class="doctor-card-modern">
+                    <div class="doctor-image-container">
+                        <?php if ($doctor_image && file_exists(UPLOAD_PATH . $doctor_image)): ?>
+                            <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor_image); ?>"
+                                 alt="<?php echo htmlspecialchars($doctor_name); ?>"
+                                 class="doctor-profile-image"
+                                 onerror="this.parentElement.innerHTML='<div class=\'doctor-placeholder\'><i class=\'fas fa-user-md\'></i></div>'">
+                        <?php else: ?>
+                            <div class="doctor-placeholder">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        <?php endif; ?>
+                        <div class="doctor-verified-badge">
+                            <i class="fas fa-shield-check"></i>
                         </div>
-                    <?php endif; ?>
-                    <div class="doctor-badge">
-                        <i class="fas fa-certificate"></i>
-                        معتمد دولياً
                     </div>
-                </div>
 
-                <div class="doctor-info">
-                    <h1><?php echo htmlspecialchars($doctor_name); ?></h1>
-                    <p class="doctor-title"><?php echo htmlspecialchars($doctor_title); ?></p>
-                    <p style="font-size: 1.15rem; line-height: 1.8; opacity: 0.95;">
-                        <?php echo nl2br(htmlspecialchars($doctor_bio)); ?>
-                    </p>
+                    <div class="doctor-card-info">
+                        <div class="doctor-name-section">
+                            <h1 class="doctor-name"><?php echo htmlspecialchars($doctor_name); ?></h1>
+                            <span class="doctor-specialty"><?php echo htmlspecialchars($doctor_title); ?></span>
+                        </div>
 
-                    <div class="doctor-highlights">
-                        <div class="highlight-item">
-                            <span class="highlight-number"><?php echo $doctor_years; ?>+</span>
-                            <span class="highlight-label">سنوات خبرة</span>
+                        <div class="doctor-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-number"><?php echo $doctor_years; ?>+</span>
+                                    <span class="stat-label">سنوات خبرة</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-number"><?php echo number_format($doctor_patients); ?>+</span>
+                                    <span class="stat-label">مريض سعيد</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-number"><?php echo number_format($doctor_cases); ?>+</span>
+                                    <span class="stat-label">حالة ناجحة</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="highlight-item">
-                            <span class="highlight-number"><?php echo number_format($doctor_patients); ?>+</span>
-                            <span class="highlight-label">مريض سعيد</span>
+
+                        <div class="doctor-bio-section">
+                            <p class="doctor-bio-text"><?php echo nl2br(htmlspecialchars($doctor_bio)); ?></p>
                         </div>
-                        <div class="highlight-item">
-                            <span class="highlight-number"><?php echo number_format($doctor_cases); ?>+</span>
-                            <span class="highlight-label">حالة ناجحة</span>
+
+                        <div class="doctor-actions">
+                            <a href="#booking" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-calendar-check"></i>
+                                احجز موعد الآن
+                            </a>
+                            <a href="#about" class="btn-modern btn-outline-modern">
+                                <i class="fas fa-info-circle"></i>
+                                المزيد عن الدكتور
+                            </a>
                         </div>
                     </div>
                 </div>
