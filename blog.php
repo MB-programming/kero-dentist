@@ -230,7 +230,7 @@ $social_youtube = getSetting('social_youtube', '');
     <nav class="modern-navbar">
         <div class="container">
             <div class="modern-nav-content">
-                <a href="doctor.php" class="modern-logo">
+                <a href="index.php" class="modern-logo">
                     <?php if ($site_logo && file_exists(UPLOAD_PATH . $site_logo)): ?>
                         <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
                     <?php else: ?>
@@ -245,11 +245,11 @@ $social_youtube = getSetting('social_youtube', '');
                             <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <li><a href="doctor.php"><i class="fas fa-home"></i> الرئيسية</a></li>
-                        <li><a href="doctor.php#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
-                        <li><a href="doctor.php#packages"><i class="fas fa-box"></i> الباقات</a></li>
+                        <li><a href="index.php"><i class="fas fa-home"></i> الرئيسية</a></li>
+                        <li><a href="index.php#services"><i class="fas fa-tooth"></i> الخدمات</a></li>
+                        <li><a href="index.php#packages"><i class="fas fa-box"></i> الباقات</a></li>
                         <li><a href="blog.php" class="active"><i class="fas fa-blog"></i> المدونة</a></li>
-                        <li><a href="doctor.php#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
+                        <li><a href="index.php#booking" class="modern-cta-btn"><i class="fas fa-calendar-check"></i> احجز الآن</a></li>
                     <?php endif; ?>
                 </ul>
 
@@ -398,11 +398,11 @@ $social_youtube = getSetting('social_youtube', '');
                                 <li><a href="<?php echo htmlspecialchars($item['url']); ?>" target="<?php echo htmlspecialchars($item['target'] ?? '_self'); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <li><a href="doctor.php">الرئيسية</a></li>
-                            <li><a href="doctor.php#services">الخدمات</a></li>
-                            <li><a href="doctor.php#packages">الباقات</a></li>
+                            <li><a href="index.php">الرئيسية</a></li>
+                            <li><a href="index.php#services">الخدمات</a></li>
+                            <li><a href="index.php#packages">الباقات</a></li>
                             <li><a href="blog.php">المدونة</a></li>
-                            <li><a href="doctor.php#booking">احجز الآن</a></li>
+                            <li><a href="index.php#booking">احجز الآن</a></li>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -431,7 +431,7 @@ $social_youtube = getSetting('social_youtube', '');
                         <li><strong>السبت - الخميس:</strong> 9:00 ص - 9:00 م</li>
                         <li><strong>الجمعة:</strong> مغلق</li>
                     </ul>
-                    <a href="doctor.php#booking" class="modern-btn modern-btn-primary" style="margin-top: 20px;">
+                    <a href="index.php#booking" class="modern-btn modern-btn-primary" style="margin-top: 20px;">
                         <i class="fas fa-calendar-check"></i>
                         احجز الآن
                     </a>
