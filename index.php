@@ -738,10 +738,13 @@ $social_youtube = getSetting('social_youtube', '');
                 <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
             </div>
 
-            <div class="doctors-grid">
-                <?php foreach ($doctors as $doctor): ?>
-                <div class="doctor-card">
-                    <div class="doctor-card-inner">
+            <?php if (count($doctors) > 3): ?>
+            <!-- Doctors Slider -->
+            <div class="doctors-slider-wrapper">
+                <div class="doctors-slider" id="doctorsSlider">
+                    <?php foreach ($doctors as $doctor): ?>
+                    <div class="doctor-card">
+                        <div class="doctor-card-inner">
                             <div class="doctor-image-wrapper">
                                 <?php if (!empty($doctor['image'])): ?>
                                     <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
@@ -807,7 +810,89 @@ $social_youtube = getSetting('social_youtube', '');
                     </div>
                 </div>
                 <?php endforeach; ?>
+                </div>
+
+                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="slider-dots" id="sliderDots"></div>
             </div>
+            <?php else: ?>
+            <!-- Doctors Grid -->
+            <div class="doctors-grid">
+                <?php foreach ($doctors as $doctor): ?>
+                <div class="doctor-card">
+                    <div class="doctor-card-inner">
+                        <div class="doctor-image-wrapper">
+                            <?php if (!empty($doctor['image'])): ?>
+                                <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
+                                     alt="<?php echo htmlspecialchars($doctor['name']); ?>"
+                                     class="doctor-image">
+                            <?php else: ?>
+                                <div class="doctor-image doctor-image-placeholder">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($doctor['years_experience'] > 0): ?>
+                            <div class="doctor-badge">
+                                <i class="fas fa-award"></i>
+                                <?php echo $doctor['years_experience']; ?> سنة خبرة
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="doctor-info">
+                            <h3 class="doctor-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
+                            <p class="doctor-title"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                            <p class="doctor-specialization">
+                                <i class="fas fa-stethoscope"></i>
+                                <?php echo htmlspecialchars($doctor['specialization']); ?>
+                            </p>
+                            <p class="doctor-bio"><?php echo htmlspecialchars($doctor['bio']); ?></p>
+
+                            <?php if ($doctor['phone'] || $doctor['email']): ?>
+                            <div class="doctor-contact">
+                                <?php if ($doctor['phone']): ?>
+                                <a href="tel:<?php echo htmlspecialchars($doctor['phone']); ?>" class="doctor-contact-btn">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($doctor['email']): ?>
+                                <a href="mailto:<?php echo htmlspecialchars($doctor['email']); ?>" class="doctor-contact-btn">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if ($doctor['facebook'] || $doctor['instagram'] || $doctor['twitter']): ?>
+                            <div class="doctor-social">
+                                <?php if ($doctor['facebook']): ?>
+                                <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank" class="doctor-social-btn">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($doctor['instagram']): ?>
+                                <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank" class="doctor-social-btn">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($doctor['twitter']): ?>
+                                <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank" class="doctor-social-btn">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </section>
     <?php endif; ?>
@@ -905,6 +990,49 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
 
             <?php if (count($reviews) > 0): ?>
+            <?php if (count($reviews) > 3): ?>
+            <!-- Reviews Slider -->
+            <div class="reviews-slider-wrapper">
+                <div class="reviews-slider" id="reviewsSlider">
+                    <?php foreach ($reviews as $review): ?>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="review-info">
+                                <h4 class="review-name"><?php echo htmlspecialchars($review['client_name']); ?></h4>
+                                <div class="review-rating">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <?php if ($i <= $review['rating']): ?>
+                                            <i class="fas fa-star"></i>
+                                        <?php else: ?>
+                                            <i class="far fa-star"></i>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="review-text">"<?php echo htmlspecialchars($review['review_text']); ?>"</p>
+                        <div class="review-footer">
+                            <i class="fas fa-check-circle"></i>
+                            <span>عميل معتمد</span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <button class="slider-nav slider-prev reviews-prev" onclick="slideReviews(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next reviews-next" onclick="slideReviews(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="slider-dots" id="reviewsSliderDots"></div>
+            </div>
+            <?php else: ?>
+            <!-- Reviews Grid -->
             <div class="reviews-grid">
                 <?php foreach ($reviews as $review): ?>
                 <div class="review-card">
@@ -933,6 +1061,7 @@ $social_youtube = getSetting('social_youtube', '');
                 </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
             <?php else: ?>
             <div class="empty-state">
                 <i class="fas fa-comments"></i>
@@ -1685,6 +1814,88 @@ $social_youtube = getSetting('social_youtube', '');
         if (totalDoctors > cardsPerSlide) {
             setInterval(() => {
                 slideDoctors(1);
+            }, 5000);
+        }
+    }
+
+    // Reviews Slider
+    let currentReviewSlide = 0;
+    const reviewCards = document.querySelectorAll('#reviewsSlider .review-card');
+    const totalReviews = reviewCards.length;
+    const reviewDotsContainer = document.getElementById('reviewsSliderDots');
+    const reviewsSlider = document.getElementById('reviewsSlider');
+
+    if (totalReviews > 0 && reviewDotsContainer && reviewsSlider) {
+        // Calculate cards per slide based on screen width
+        function getReviewsPerSlide() {
+            const width = window.innerWidth;
+            if (width <= 640) return 1;
+            if (width <= 1024) return 2;
+            return 3;
+        }
+
+        let reviewsPerSlide = getReviewsPerSlide();
+        const totalReviewPages = Math.ceil(totalReviews / reviewsPerSlide);
+
+        // Create dots
+        function createReviewDots() {
+            reviewDotsContainer.innerHTML = '';
+            const pages = Math.ceil(totalReviews / reviewsPerSlide);
+
+            if (pages > 1) {
+                for (let i = 0; i < pages; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'slider-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.onclick = () => goToReviewSlide(i);
+                    reviewDotsContainer.appendChild(dot);
+                }
+            }
+        }
+
+        createReviewDots();
+
+        function updateReviewSlider() {
+            const offset = -currentReviewSlide * 100;
+            reviewsSlider.style.transform = `translateX(${offset}%)`;
+
+            const dots = document.querySelectorAll('#reviewsSliderDots .slider-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentReviewSlide);
+            });
+        }
+
+        function goToReviewSlide(index) {
+            const pages = Math.ceil(totalReviews / reviewsPerSlide);
+            currentReviewSlide = Math.max(0, Math.min(index, pages - 1));
+            updateReviewSlider();
+        }
+
+        window.slideReviews = function(direction) {
+            const pages = Math.ceil(totalReviews / reviewsPerSlide);
+            currentReviewSlide = (currentReviewSlide + direction + pages) % pages;
+            updateReviewSlider();
+        };
+
+        // Handle window resize
+        let reviewResizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(reviewResizeTimer);
+            reviewResizeTimer = setTimeout(function() {
+                const newReviewsPerSlide = getReviewsPerSlide();
+                if (newReviewsPerSlide !== reviewsPerSlide) {
+                    reviewsPerSlide = newReviewsPerSlide;
+                    currentReviewSlide = 0;
+                    createReviewDots();
+                    updateReviewSlider();
+                }
+            }, 250);
+        });
+
+        // Auto-slide every 5 seconds
+        if (totalReviews > reviewsPerSlide) {
+            setInterval(() => {
+                slideReviews(1);
             }, 5000);
         }
     }
