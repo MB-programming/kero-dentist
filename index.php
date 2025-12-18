@@ -415,6 +415,11 @@ $social_youtube = getSetting('social_youtube', '');
                 </ul>
 
                 <div class="modern-nav-actions">
+                    <a href="#booking" class="modern-booking-btn">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>احجز الآن</span>
+                    </a>
+
                     <div class="modern-social-icons">
                         <?php if (!empty($social_facebook)): ?>
                             <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank" rel="noopener" title="Facebook">
@@ -819,13 +824,16 @@ $social_youtube = getSetting('social_youtube', '');
             <div class="modern-services-grid">
                 <?php foreach ($services as $service): ?>
                 <div class="modern-service-card">
-                    <?php if (!empty($service['image'])): ?>
+                    <?php if (!empty($service['image']) && isset($service['image'])): ?>
                         <img src="<?php echo UPLOAD_URL . htmlspecialchars($service['image']); ?>"
                              alt="<?php echo htmlspecialchars($service['title']); ?>"
                              class="modern-service-image">
                     <?php else: ?>
                         <div class="modern-service-image" style="background: linear-gradient(135deg, var(--primary-light), var(--accent)); display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-tooth" style="font-size: 4rem; color: white;"></i>
+                            <?php
+                            $icon = !empty($service['icon']) ? $service['icon'] : 'fa-tooth';
+                            ?>
+                            <i class="fas <?php echo htmlspecialchars($icon); ?>" style="font-size: 4rem; color: white;"></i>
                         </div>
                     <?php endif; ?>
                     <div class="modern-service-content">
