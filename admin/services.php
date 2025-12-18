@@ -32,9 +32,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $display_order = intval($_POST['display_order']);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-    // Handle image upload
+    // Handle image upload (if column exists)
     $image = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $has_image_column = false;
+
+    // Check if image column exists
+    try {
+        $check_stmt = $conn->query("SHOW COLUMNS FROM services LIKE 'image'");
+        $has_image_column = $check_stmt->rowCount() > 0;
+    } catch(PDOException $e) {
+        $has_image_column = false;
+    }
+
+    if ($has_image_column && isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         // Delete old image if updating
         if ($id) {
             $stmt = $conn->prepare("SELECT image FROM services WHERE id = ?");
@@ -55,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($id) {
-        if (!empty($image)) {
+        // Update
+        if ($has_image_column && !empty($image)) {
             $stmt = $conn->prepare("UPDATE services SET title = ?, description = ?, icon = ?, image = ?, display_order = ?, is_active = ? WHERE id = ?");
             $stmt->execute([$title, $description, $icon, $image, $display_order, $is_active, $id]);
         } else {
@@ -64,8 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $success_message = 'تم تحديث الخدمة بنجاح';
     } else {
-        $stmt = $conn->prepare("INSERT INTO services (title, description, icon, image, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $icon, $image, $display_order, $is_active]);
+        // Insert
+        if ($has_image_column) {
+            $stmt = $conn->prepare("INSERT INTO services (title, description, icon, image, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $icon, $image, $display_order, $is_active]);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO services (title, description, icon, display_order, is_active) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $icon, $display_order, $is_active]);
+        }
         $success_message = 'تم إضافة الخدمة بنجاح';
     }
 }
@@ -164,7 +181,43 @@ $services = $stmt->fetchAll();
                 <div class="form-row">
                     <div class="form-group">
                         <label>الأيقونة (Font Awesome - اختياري)</label>
-                        <input type="text" name="icon" id="service_icon" placeholder="fa-tooth">
+                        <select name="icon" id="service_icon" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                            <option value="">-- اختر أيقونة --</option>
+                            <option value="fa-tooth">🦷 سن - fa-tooth</option>
+                            <option value="fa-teeth">🦷 أسنان - fa-teeth</option>
+                            <option value="fa-teeth-open">😁 أسنان مفتوحة - fa-teeth-open</option>
+                            <option value="fa-smile">😊 ابتسامة - fa-smile</option>
+                            <option value="fa-smile-beam">😄 ابتسامة عريضة - fa-smile-beam</option>
+                            <option value="fa-grin">😀 ضحكة - fa-grin</option>
+                            <option value="fa-grin-beam">😁 ضحكة كبيرة - fa-grin-beam</option>
+                            <option value="fa-grin-stars">🤩 ابتسامة بنجوم - fa-grin-stars</option>
+                            <option value="fa-user-md">👨‍⚕️ طبيب - fa-user-md</option>
+                            <option value="fa-user-nurse">👩‍⚕️ ممرضة - fa-user-nurse</option>
+                            <option value="fa-heartbeat">💓 نبضات القلب - fa-heartbeat</option>
+                            <option value="fa-heart">❤️ قلب - fa-heart</option>
+                            <option value="fa-hospital">🏥 مستشفى - fa-hospital</option>
+                            <option value="fa-clinic-medical">🏥 عيادة - fa-clinic-medical</option>
+                            <option value="fa-syringe">💉 حقنة - fa-syringe</option>
+                            <option value="fa-prescription-bottle">💊 دواء - fa-prescription-bottle</option>
+                            <option value="fa-pills">💊 حبوب - fa-pills</option>
+                            <option value="fa-capsules">💊 كبسولات - fa-capsules</option>
+                            <option value="fa-stethoscope">🩺 سماعة طبيب - fa-stethoscope</option>
+                            <option value="fa-microscope">🔬 ميكروسكوب - fa-microscope</option>
+                            <option value="fa-x-ray">🩻 أشعة - fa-x-ray</option>
+                            <option value="fa-shield-virus">🛡️ حماية - fa-shield-virus</option>
+                            <option value="fa-hand-holding-medical">🤲 رعاية طبية - fa-hand-holding-medical</option>
+                            <option value="fa-briefcase-medical">💼 حقيبة طبية - fa-briefcase-medical</option>
+                            <option value="fa-first-aid">🩹 إسعافات - fa-first-aid</option>
+                            <option value="fa-band-aid">🩹 ضمادة - fa-band-aid</option>
+                            <option value="fa-star">⭐ نجمة - fa-star</option>
+                            <option value="fa-award">🏆 جائزة - fa-award</option>
+                            <option value="fa-certificate">📜 شهادة - fa-certificate</option>
+                            <option value="fa-medal">🏅 ميدالية - fa-medal</option>
+                            <option value="fa-check-circle">✅ تأكيد - fa-check-circle</option>
+                            <option value="fa-shield-check">✅ حماية مؤكدة - fa-shield-check</option>
+                            <option value="fa-calendar-check">📅 موعد - fa-calendar-check</option>
+                            <option value="fa-clock">🕐 ساعة - fa-clock</option>
+                        </select>
                         <small style="display: block; margin-top: 5px; color: #6b7280;">تُستخدم فقط إذا لم يتم رفع صورة</small>
                     </div>
                     <div class="form-group">

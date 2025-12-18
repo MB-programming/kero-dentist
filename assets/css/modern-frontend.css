@@ -1812,6 +1812,11 @@ body {
     min-width: calc(33.333% - 20px);
 }
 
+/* Hide slider navigation when not needed */
+.doctors-slider-wrapper:has(.slider-dots:empty) .slider-nav {
+    display: none;
+}
+
 .doctor-card {
     background: white;
     border-radius: 20px;

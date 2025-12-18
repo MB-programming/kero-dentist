@@ -804,8 +804,7 @@ $social_youtube = getSetting('social_youtube', '');
                     <?php endforeach; ?>
                 </div>
 
-                <?php if (count($doctors) > 1): ?>
-                <!-- Slider Navigation -->
+                <!-- Slider Navigation (will be hidden via CSS if not needed) -->
                 <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
                     <i class="fas fa-chevron-right"></i>
                 </button>
@@ -813,9 +812,8 @@ $social_youtube = getSetting('social_youtube', '');
                     <i class="fas fa-chevron-left"></i>
                 </button>
 
-                <!-- Slider Dots -->
+                <!-- Slider Dots (will be populated via JS if needed) -->
                 <div class="slider-dots" id="sliderDots"></div>
-                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -1630,12 +1628,16 @@ $social_youtube = getSetting('social_youtube', '');
         function createDots() {
             dotsContainer.innerHTML = '';
             const pages = Math.ceil(totalDoctors / cardsPerSlide);
-            for (let i = 0; i < pages; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'slider-dot';
-                if (i === 0) dot.classList.add('active');
-                dot.onclick = () => goToSlide(i);
-                dotsContainer.appendChild(dot);
+
+            // Only create dots if there's more than one page
+            if (pages > 1) {
+                for (let i = 0; i < pages; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'slider-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                }
             }
         }
 
