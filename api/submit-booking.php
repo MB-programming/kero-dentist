@@ -14,6 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
+    // Check if bookings table exists
+    try {
+        $conn->query("SELECT 1 FROM bookings LIMIT 1");
+    } catch(PDOException $e) {
+        // Create bookings table if it doesn't exist
+        $conn->exec("
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                client_name VARCHAR(255) NOT NULL,
+                client_email VARCHAR(255),
+                client_address TEXT,
+                client_phone VARCHAR(50) NOT NULL,
+                client_whatsapp VARCHAR(50) NOT NULL,
+                booking_date DATE NOT NULL,
+                booking_time VARCHAR(20) NOT NULL,
+                booking_day VARCHAR(50),
+                package_id INT,
+                status VARCHAR(50) DEFAULT 'pending',
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_status (status),
+                INDEX idx_date (booking_date)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+    }
+
     // Validate required fields
     $required_fields = ['client_name', 'client_phone', 'client_whatsapp', 'booking_date', 'booking_time', 'package_id'];
     foreach ($required_fields as $field) {

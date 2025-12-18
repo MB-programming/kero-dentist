@@ -733,11 +733,10 @@ $social_youtube = getSetting('social_youtube', '');
                 <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
             </div>
 
-            <div class="doctors-slider-wrapper">
-                <div class="doctors-slider" id="doctorsSlider">
-                    <?php foreach ($doctors as $doctor): ?>
-                    <div class="doctor-card">
-                        <div class="doctor-card-inner">
+            <div class="doctors-grid">
+                <?php foreach ($doctors as $doctor): ?>
+                <div class="doctor-card">
+                    <div class="doctor-card-inner">
                             <div class="doctor-image-wrapper">
                                 <?php if (!empty($doctor['image'])): ?>
                                     <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
@@ -801,19 +800,8 @@ $social_youtube = getSetting('social_youtube', '');
                             </div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
                 </div>
-
-                <!-- Slider Navigation (will be hidden via CSS if not needed) -->
-                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <!-- Slider Dots (will be populated via JS if needed) -->
-                <div class="slider-dots" id="sliderDots"></div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
