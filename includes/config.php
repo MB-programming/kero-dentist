@@ -1,9 +1,9 @@
 <?php
-// Database Configuration
+// Database Configuration - Production
 define('DB_HOST', 'localhost');
-define('DB_USER', 'u186120816_tantawy');
-define('DB_PASS', '54AC>TU/t');
-define('DB_NAME', 'u186120816_tantawy');
+define('DB_USER', 'u186120816_kero_dentist');
+define('DB_PASS', '9Ea$eZnZ#');
+define('DB_NAME', 'u186120816_kero_dentist');
 
 // Site Configuration - Auto detect
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
@@ -57,7 +57,7 @@ try {
 } catch(PDOException $e) {
     // Log error and show friendly message
     error_log("Database connection error: " . $e->getMessage());
-    die("خطأ في الاتصال بقاعدة البيانات. يرجى التأكد من:<br>1. إنشاء قاعدة البيانات (u186120816_tantawy)<br>2. استيراد ملف database.sql<br>3. التحقق من بيانات الاتصال في includes/config.php<br>4. وضع كلمة مرور قاعدة البيانات في DB_PASS<br><br>Error: " . $e->getMessage());
+    die("خطأ في الاتصال بقاعدة البيانات. يرجى التأكد من:<br>1. إنشاء قاعدة البيانات (u186120816_kero_dentist)<br>2. استيراد ملف database.sql<br>3. التحقق من بيانات الاتصال في includes/config.php<br>4. وضع كلمة مرور قاعدة البيانات في DB_PASS<br><br>Error: " . $e->getMessage());
 }
 
 // Helper Functions

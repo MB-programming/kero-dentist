@@ -377,7 +377,6 @@ function updateBookingStatus(id, status) {
     });
 }
 
-<script>
 function viewBooking(id) {
     fetch('../api/get-booking.php?id=' + id)
         .then(res => res.json())
