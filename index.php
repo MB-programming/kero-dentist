@@ -55,6 +55,31 @@ try {
     $blog_posts = [];
 }
 
+// Fetch active specialties
+try {
+    // Create table if not exists
+    $conn->exec("
+        CREATE TABLE IF NOT EXISTS specialties (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            icon VARCHAR(100),
+            display_order INT DEFAULT 0,
+            is_active TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_active (is_active),
+            INDEX idx_order (display_order)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $stmt = $conn->prepare("SELECT * FROM specialties WHERE is_active = 1 ORDER BY display_order ASC LIMIT 6");
+    $stmt->execute();
+    $specialties = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $specialties = [];
+}
+
 // Fetch menu items
 try {
     $stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
@@ -97,6 +122,15 @@ $social_youtube = getSetting('social_youtube', '');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($doctor_name) . ' - ' . htmlspecialchars($site_name); ?></title>
+
+    <!-- Favicon -->
+    <?php
+    $site_favicon = getSetting('site_favicon');
+    if ($site_favicon && file_exists(UPLOAD_PATH . $site_favicon)):
+    ?>
+    <link rel="icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
+    <?php endif; ?>
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -658,53 +692,66 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
 
             <div class="spec-grid">
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-teeth-open"></i>
+                <?php if (count($specialties) > 0): ?>
+                    <?php foreach ($specialties as $specialty): ?>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas <?php echo htmlspecialchars($specialty['icon']); ?>"></i>
+                        </div>
+                        <h3 class="spec-title"><?php echo htmlspecialchars($specialty['title']); ?></h3>
+                        <p class="spec-desc"><?php echo htmlspecialchars($specialty['description']); ?></p>
                     </div>
-                    <h3 class="spec-title">زراعة الأسنان</h3>
-                    <p class="spec-desc">خبرة متقدمة في زراعة الأسنان باستخدام أحدث التقنيات العالمية</p>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <!-- Default specialties if none in database -->
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-teeth-open"></i>
+                        </div>
+                        <h3 class="spec-title">زراعة الأسنان</h3>
+                        <p class="spec-desc">خبرة متقدمة في زراعة الأسنان باستخدام أحدث التقنيات العالمية</p>
+                    </div>
 
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-tooth"></i>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-tooth"></i>
+                        </div>
+                        <h3 class="spec-title">التركيبات الثابتة</h3>
+                        <p class="spec-desc">تصميم وتركيب التيجان والجسور بأعلى معايير الجودة</p>
                     </div>
-                    <h3 class="spec-title">التركيبات الثابتة</h3>
-                    <p class="spec-desc">تصميم وتركيب التيجان والجسور بأعلى معايير الجودة</p>
-                </div>
 
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-smile"></i>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <h3 class="spec-title">تجميل الأسنان</h3>
+                        <p class="spec-desc">ابتسامة هوليود، التبييض، واللومينير لابتسامة مثالية</p>
                     </div>
-                    <h3 class="spec-title">تجميل الأسنان</h3>
-                    <p class="spec-desc">ابتسامة هوليود، التبييض، واللومينير لابتسامة مثالية</p>
-                </div>
 
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-syringe"></i>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <h3 class="spec-title">علاج الجذور</h3>
+                        <p class="spec-desc">علاج عصب الأسنان بدون ألم باستخدام أحدث الأجهزة</p>
                     </div>
-                    <h3 class="spec-title">علاج الجذور</h3>
-                    <p class="spec-desc">علاج عصب الأسنان بدون ألم باستخدام أحدث الأجهزة</p>
-                </div>
 
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-child"></i>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <h3 class="spec-title">طب أسنان الأطفال</h3>
+                        <p class="spec-desc">رعاية متخصصة للأطفال في بيئة مريحة وآمنة</p>
                     </div>
-                    <h3 class="spec-title">طب أسنان الأطفال</h3>
-                    <p class="spec-desc">رعاية متخصصة للأطفال في بيئة مريحة وآمنة</p>
-                </div>
 
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas fa-teeth"></i>
+                    <div class="spec-card">
+                        <div class="spec-icon">
+                            <i class="fas fa-teeth"></i>
+                        </div>
+                        <h3 class="spec-title">تقويم الأسنان</h3>
+                        <p class="spec-desc">تقويم تقليدي وشفاف لجميع الأعمار</p>
                     </div>
-                    <h3 class="spec-title">تقويم الأسنان</h3>
-                    <p class="spec-desc">تقويم تقليدي وشفاف لجميع الأعمار</p>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>

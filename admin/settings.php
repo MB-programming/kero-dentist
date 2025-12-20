@@ -29,6 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Handle favicon upload
+        if (isset($_FILES['site_favicon']) && $_FILES['site_favicon']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = uploadFile($_FILES['site_favicon'], 'favicon');
+            if ($upload_result['success']) {
+                updateSetting('site_favicon', $upload_result['path']);
+            }
+        }
+
         // Handle other settings
         foreach ($_POST as $key => $value) {
             if ($key !== 'submit') {
@@ -95,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Logo Settings -->
     <div class="card">
         <div class="card-header">
-            <h2>شعار الموقع</h2>
+            <h2>شعار الموقع والأيقونة</h2>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -111,6 +119,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p style="margin-bottom: 10px; color: var(--text-light);">الشعار الحالي:</p>
                         <img src="<?php echo UPLOAD_URL . htmlspecialchars($current_logo); ?>"
                              alt="Current Logo" style="max-width: 200px; max-height: 100px;">
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="form-group" style="margin-top: 30px;">
+                <label>رفع Favicon (أيقونة المتصفح)</label>
+                <input type="file" name="site_favicon" accept="image/x-icon,image/png,image/jpg,image/jpeg">
+                <small style="color: var(--text-light); display: block; margin-top: 5px;">
+                    الحجم الموصى به: 32x32 أو 64x64 بكسل (ICO, PNG, أو JPG)
+                </small>
+                <?php
+                $current_favicon = getSetting('site_favicon');
+                if ($current_favicon): ?>
+                    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <p style="margin-bottom: 10px; color: var(--text-light);">الأيقونة الحالية:</p>
+                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($current_favicon); ?>"
+                             alt="Current Favicon" style="width: 32px; height: 32px;">
                     </div>
                 <?php endif; ?>
             </div>

@@ -15,6 +15,15 @@ $site_name = getSetting('site_name', 'Dr. Ahmed Clinic');
     <title>جميع الأطباء - <?php echo htmlspecialchars($site_name); ?></title>
     <meta name="description" content="تعرف على فريقنا الطبي المتخصص">
 
+    <!-- Favicon -->
+    <?php
+    $site_favicon = getSetting('site_favicon');
+    if ($site_favicon && file_exists(UPLOAD_PATH . $site_favicon)):
+    ?>
+    <link rel="icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
+    <?php endif; ?>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/modern-frontend.css">
 </head>
