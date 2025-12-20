@@ -119,10 +119,32 @@ try {
 
     $booking_id = $conn->lastInsertId();
 
+    // Build success message with booking details
+    $success_msg = sprintf(
+        "✅ تم تأكيد حجزك بنجاح!\n\n" .
+        "📋 رقم الحجز: #%d\n" .
+        "📅 التاريخ: %s\n" .
+        "⏰ الموعد: %s\n" .
+        "📦 الباقة: %s\n\n" .
+        "سنتواصل معك قريباً عبر واتساب على الرقم: %s\n" .
+        "يمكنك متابعة حالة حجزك من خلال التواصل معنا",
+        $booking_id,
+        date('Y/m/d', strtotime($booking_date)),
+        $booking_time,
+        $package['name'],
+        $client_whatsapp
+    );
+
     echo json_encode([
         'success' => true,
-        'message' => 'تم إرسال حجزك بنجاح! سنتواصل معك قريباً عبر واتساب.',
-        'booking_id' => $booking_id
+        'message' => $success_msg,
+        'booking_id' => $booking_id,
+        'booking_details' => [
+            'date' => $booking_date,
+            'time' => $booking_time,
+            'package' => $package['name'],
+            'package_price' => $package['price']
+        ]
     ]);
 
 } catch(PDOException $e) {

@@ -1874,23 +1874,23 @@ $social_youtube = getSetting('social_youtube', '');
     }
 
     // Reviews Slider
-    let currentReviewSlide = 0;
-    const reviewCards = document.querySelectorAll('#reviewsSlider .review-card');
-    const totalReviews = reviewCards.length;
+    const reviewsSliderEl = document.getElementById('reviewsSlider');
     const reviewDotsContainer = document.getElementById('reviewsSliderDots');
-    const reviewsSlider = document.getElementById('reviewsSlider');
 
-    if (totalReviews > 0 && reviewDotsContainer && reviewsSlider) {
+    if (reviewsSliderEl && reviewDotsContainer) {
+        let currentReviewSlide = 0;
+        const reviewCards = reviewsSliderEl.querySelectorAll('.review-card');
+        const totalReviews = reviewCards.length;
+
         // Calculate cards per slide based on screen width
         function getReviewsPerSlide() {
             const width = window.innerWidth;
-            if (width <= 640) return 1;
+            if (width <= 768) return 1;
             if (width <= 1024) return 2;
             return 3;
         }
 
         let reviewsPerSlide = getReviewsPerSlide();
-        const totalReviewPages = Math.ceil(totalReviews / reviewsPerSlide);
 
         // Create dots
         function createReviewDots() {
@@ -1911,8 +1911,14 @@ $social_youtube = getSetting('social_youtube', '');
         createReviewDots();
 
         function updateReviewSlider() {
-            const offset = -currentReviewSlide * 100;
-            reviewsSlider.style.transform = `translateX(${offset}%)`;
+            // Calculate the width of each card plus gap
+            const cardWidth = reviewCards[0].offsetWidth;
+            const gap = 30; // Same as CSS gap
+            const slideWidth = cardWidth + gap;
+
+            // Calculate offset based on cards per slide
+            const offset = -currentReviewSlide * slideWidth * reviewsPerSlide;
+            reviewsSliderEl.style.transform = `translateX(${offset}px)`;
 
             const dots = document.querySelectorAll('#reviewsSliderDots .slider-dot');
             dots.forEach((dot, index) => {
@@ -1946,6 +1952,9 @@ $social_youtube = getSetting('social_youtube', '');
                 }
             }, 250);
         });
+
+        // Initialize slider position
+        updateReviewSlider();
 
         // Auto-slide every 5 seconds
         if (totalReviews > reviewsPerSlide) {
