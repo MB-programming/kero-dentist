@@ -46,6 +46,15 @@ try {
     $reviews = [];
 }
 
+// Fetch recent blog posts
+try {
+    $stmt = $conn->prepare("SELECT * FROM blog_posts WHERE is_published = 1 ORDER BY created_at DESC LIMIT 6");
+    $stmt->execute();
+    $blog_posts = $stmt->fetchAll();
+} catch(PDOException $e) {
+    $blog_posts = [];
+}
+
 // Fetch menu items
 try {
     $stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
@@ -738,93 +747,12 @@ $social_youtube = getSetting('social_youtube', '');
                 <p class="modern-section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
             </div>
 
-            <?php if (count($doctors) > 3): ?>
-            <!-- Doctors Slider -->
-            <div class="doctors-slider-wrapper">
-                <div class="doctors-slider" id="doctorsSlider">
-                    <?php foreach ($doctors as $doctor): ?>
-                    <div class="doctor-card">
-                        <div class="doctor-card-inner">
-                            <div class="doctor-image-wrapper">
-                                <?php if (!empty($doctor['image'])): ?>
-                                    <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>"
-                                         alt="<?php echo htmlspecialchars($doctor['name']); ?>"
-                                         class="doctor-image">
-                                <?php else: ?>
-                                    <div class="doctor-image doctor-image-placeholder">
-                                        <i class="fas fa-user-md"></i>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if ($doctor['years_experience'] > 0): ?>
-                                <div class="doctor-badge">
-                                    <i class="fas fa-award"></i>
-                                    <?php echo $doctor['years_experience']; ?> سنة خبرة
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="doctor-info">
-                                <h3 class="doctor-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
-                                <p class="doctor-title"><?php echo htmlspecialchars($doctor['title']); ?></p>
-                                <p class="doctor-specialization">
-                                    <i class="fas fa-stethoscope"></i>
-                                    <?php echo htmlspecialchars($doctor['specialization']); ?>
-                                </p>
-                                <p class="doctor-bio"><?php echo htmlspecialchars($doctor['bio']); ?></p>
-
-                                <?php if ($doctor['phone'] || $doctor['email']): ?>
-                                <div class="doctor-contact">
-                                    <?php if ($doctor['phone']): ?>
-                                    <a href="tel:<?php echo htmlspecialchars($doctor['phone']); ?>" class="doctor-contact-btn">
-                                        <i class="fas fa-phone"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <?php if ($doctor['email']): ?>
-                                    <a href="mailto:<?php echo htmlspecialchars($doctor['email']); ?>" class="doctor-contact-btn">
-                                        <i class="fas fa-envelope"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                </div>
-                                <?php endif; ?>
-
-                                <?php if ($doctor['facebook'] || $doctor['instagram'] || $doctor['twitter']): ?>
-                                <div class="doctor-social">
-                                    <?php if ($doctor['facebook']): ?>
-                                    <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank" class="doctor-social-btn">
-                                        <i class="fab fa-facebook-f"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <?php if ($doctor['instagram']): ?>
-                                    <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank" class="doctor-social-btn">
-                                        <i class="fab fa-instagram"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <?php if ($doctor['twitter']): ?>
-                                    <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank" class="doctor-social-btn">
-                                        <i class="fab fa-twitter"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-                </div>
-
-                <button class="slider-nav slider-prev" onclick="slideDoctors(-1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <button class="slider-nav slider-next" onclick="slideDoctors(1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <div class="slider-dots" id="sliderDots"></div>
-            </div>
-            <?php else: ?>
             <!-- Doctors Grid -->
             <div class="doctors-grid">
-                <?php foreach ($doctors as $doctor): ?>
+                <?php
+                $doctors_to_show = array_slice($doctors, 0, 6);
+                foreach ($doctors_to_show as $doctor):
+                ?>
                 <div class="doctor-card">
                     <div class="doctor-card-inner">
                         <div class="doctor-image-wrapper">
@@ -892,6 +820,13 @@ $social_youtube = getSetting('social_youtube', '');
                 </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php if (count($doctors) > 6): ?>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="doctors.php" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-user-md"></i> مشاهدة جميع الأطباء
+                </a>
+            </div>
             <?php endif; ?>
         </div>
     </section>
@@ -907,7 +842,10 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
 
             <div class="modern-services-grid">
-                <?php foreach ($services as $service): ?>
+                <?php
+                $services_to_show = array_slice($services, 0, 6);
+                foreach ($services_to_show as $service):
+                ?>
                 <div class="modern-service-card">
                     <?php if (!empty($service['image']) && isset($service['image'])): ?>
                         <img src="<?php echo UPLOAD_URL . htmlspecialchars($service['image']); ?>"
@@ -935,6 +873,14 @@ $social_youtube = getSetting('social_youtube', '');
                 </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php if (count($services) > 6): ?>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="services.php" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-th"></i> مشاهدة جميع الخدمات
+                </a>
+            </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -1172,6 +1118,68 @@ $social_youtube = getSetting('social_youtube', '');
             </form>
         </div>
     </section>
+
+    <!-- Blog Posts Slider Section -->
+    <?php if (count($blog_posts) > 0): ?>
+    <section class="modern-section" style="background: #f0f2f5; padding: 80px 0;">
+        <div class="container">
+            <div class="modern-section-header">
+                <span class="modern-section-badge">مقالاتنا</span>
+                <h2 class="modern-section-title">أحدث المقالات الطبية</h2>
+                <p class="modern-section-subtitle">اقرأ أحدث مقالاتنا في عالم طب الأسنان</p>
+            </div>
+
+            <div class="blog-posts-slider-wrapper">
+                <div class="blog-posts-slider" id="blogPostsSlider">
+                    <?php foreach ($blog_posts as $post): ?>
+                    <div class="blog-post-card">
+                        <?php if (!empty($post['featured_image'])): ?>
+                            <div class="blog-post-image" style="background-image: url('<?php echo UPLOAD_URL . htmlspecialchars($post['featured_image']); ?>');"></div>
+                        <?php else: ?>
+                            <div class="blog-post-image" style="background: linear-gradient(135deg, var(--primary), var(--accent));"></div>
+                        <?php endif; ?>
+                        <div class="blog-post-content">
+                            <div class="blog-post-meta">
+                                <span><i class="fas fa-calendar"></i> <?php echo date('d/m/Y', strtotime($post['created_at'])); ?></span>
+                                <span><i class="fas fa-user"></i> <?php echo htmlspecialchars($post['author'] ?? 'Admin'); ?></span>
+                            </div>
+                            <h3 class="blog-post-title"><?php echo htmlspecialchars($post['title']); ?></h3>
+                            <p class="blog-post-excerpt">
+                                <?php
+                                $excerpt = isset($post['excerpt']) && !empty($post['excerpt'])
+                                    ? $post['excerpt']
+                                    : (isset($post['content']) ? substr(strip_tags($post['content']), 0, 120) . '...' : '');
+                                echo htmlspecialchars($excerpt);
+                                ?>
+                            </p>
+                            <a href="blog-post.php?slug=<?php echo htmlspecialchars($post['slug'] ?? $post['id']); ?>" class="blog-post-read-more">
+                                اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <?php if (count($blog_posts) > 1): ?>
+                <button class="slider-nav slider-prev blog-prev" onclick="slideBlogPosts(-1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="slider-nav slider-next blog-next" onclick="slideBlogPosts(1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="slider-dots" id="blogSliderDots"></div>
+                <?php endif; ?>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="blog.php" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-newspaper"></i> مشاهدة جميع المقالات
+                </a>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- Footer -->
     <footer class="modern-footer">
@@ -1938,6 +1946,88 @@ $social_youtube = getSetting('social_youtube', '');
             });
         });
     });
+
+    // Blog Posts Slider
+    const blogSlider = document.getElementById('blogPostsSlider');
+    const blogDotsContainer = document.getElementById('blogSliderDots');
+
+    if (blogSlider && blogDotsContainer) {
+        let currentBlogSlide = 0;
+        const blogCards = document.querySelectorAll('.blog-post-card');
+        const totalBlogPosts = blogCards.length;
+
+        function getBlogPerSlide() {
+            const width = window.innerWidth;
+            if (width <= 768) return 1;
+            if (width <= 1024) return 2;
+            return 3;
+        }
+
+        let blogPerSlide = getBlogPerSlide();
+
+        function createBlogDots() {
+            blogDotsContainer.innerHTML = '';
+            const pages = Math.ceil(totalBlogPosts / blogPerSlide);
+
+            if (pages > 1) {
+                for (let i = 0; i < pages; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'slider-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.onclick = () => goToBlogSlide(i);
+                    blogDotsContainer.appendChild(dot);
+                }
+            }
+        }
+
+        if (totalBlogPosts > 0) {
+            createBlogDots();
+        }
+
+        function updateBlogSlider() {
+            const offset = -currentBlogSlide * 100;
+            blogSlider.style.transform = `translateX(${offset}%)`;
+
+            const dots = document.querySelectorAll('#blogSliderDots .slider-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentBlogSlide);
+            });
+        }
+
+        function goToBlogSlide(index) {
+            const pages = Math.ceil(totalBlogPosts / blogPerSlide);
+            currentBlogSlide = Math.max(0, Math.min(index, pages - 1));
+            updateBlogSlider();
+        }
+
+        window.slideBlogPosts = function(direction) {
+            const pages = Math.ceil(totalBlogPosts / blogPerSlide);
+            currentBlogSlide = (currentBlogSlide + direction + pages) % pages;
+            updateBlogSlider();
+        };
+
+        // Handle window resize
+        let blogResizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(blogResizeTimer);
+            blogResizeTimer = setTimeout(function() {
+                const newBlogPerSlide = getBlogPerSlide();
+                if (newBlogPerSlide !== blogPerSlide) {
+                    blogPerSlide = newBlogPerSlide;
+                    currentBlogSlide = 0;
+                    createBlogDots();
+                    updateBlogSlider();
+                }
+            }, 250);
+        });
+
+        // Auto-slide every 6 seconds
+        if (totalBlogPosts > blogPerSlide) {
+            setInterval(() => {
+                slideBlogPosts(1);
+            }, 6000);
+        }
+    }
     </script>
 </body>
 </html>
