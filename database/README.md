@@ -1,10 +1,11 @@
-# قاعدة بيانات الحجوزات المنفصلة
+# قاعدة بيانات الحجوزات
 
 ## 📋 نظرة عامة
 
-قاعدة بيانات مستقلة خاصة بحجوزات العيادة، منفصلة تماماً عن قاعدة البيانات الرئيسية للموقع.
+قاعدة بيانات خاصة بحجوزات العيادة مع جداول منفصلة للحفاظ على تنظيم البيانات.
 
-**اسم قاعدة البيانات:** `kero_dentist_bookings`
+**اسم قاعدة البيانات:** `u186120816_kero_dentist`
+**اسم المستخدم:** `u186120816_kero_dentist`
 
 ---
 
@@ -225,17 +226,17 @@ WHERE status = 'completed';
 
 ```bash
 # نسخة احتياطية كاملة
-mysqldump -u root -p kero_dentist_bookings > backup_$(date +%Y%m%d).sql
+mysqldump -u u186120816_kero_dentist -p u186120816_kero_dentist > backup_$(date +%Y%m%d).sql
 
 # نسخة احتياطية للحجوزات فقط
-mysqldump -u root -p kero_dentist_bookings bookings > bookings_backup.sql
+mysqldump -u u186120816_kero_dentist -p u186120816_kero_dentist bookings > bookings_backup.sql
 ```
 
 ### الاستعادة
 
 ```bash
 # استعادة من نسخة احتياطية
-mysql -u root -p kero_dentist_bookings < backup_20251220.sql
+mysql -u u186120816_kero_dentist -p u186120816_kero_dentist < backup_20251220.sql
 ```
 
 ### صلاحيات المستخدم

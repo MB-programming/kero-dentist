@@ -1,16 +1,12 @@
 -- ===================================================================
 -- Kero Dentist - Booking Database SQL
--- قاعدة بيانات منفصلة لحجوزات العيادة
+-- قاعدة بيانات الحجوزات للعيادة
 -- Created: 2025
 -- ===================================================================
 
--- إنشاء قاعدة البيانات
-CREATE DATABASE IF NOT EXISTS `kero_dentist_bookings`
-DEFAULT CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
 -- استخدام قاعدة البيانات
-USE `kero_dentist_bookings`;
+-- ملاحظة: قاعدة البيانات موجودة بالفعل على السيرفر
+USE `u186120816_kero_dentist`;
 
 -- ===================================================================
 -- جدول الحجوزات (Bookings Table)
@@ -341,7 +337,7 @@ DELIMITER ;
 -- منح الصلاحيات (تأكد من تغيير اسم المستخدم في الإنتاج)
 -- ===================================================================
 
--- GRANT ALL PRIVILEGES ON kero_dentist_bookings.* TO 'your_username'@'localhost';
+-- GRANT ALL PRIVILEGES ON u186120816_kero_dentist.* TO 'u186120816_kero_dentist'@'localhost';
 -- FLUSH PRIVILEGES;
 
 -- ===================================================================
@@ -362,10 +358,10 @@ DELIMITER ;
 - احذف البيانات التجريبية قبل النشر في الإنتاج
 
 للنسخ الاحتياطي:
-mysqldump -u username -p kero_dentist_bookings > backup.sql
+mysqldump -u u186120816_kero_dentist -p u186120816_kero_dentist > backup.sql
 
 للاستعادة:
-mysql -u username -p kero_dentist_bookings < backup.sql
+mysql -u u186120816_kero_dentist -p u186120816_kero_dentist < backup.sql
 */
 
 -- ===================================================================
