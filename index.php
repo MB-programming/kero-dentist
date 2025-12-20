@@ -983,51 +983,12 @@ $social_youtube = getSetting('social_youtube', '');
             </div>
 
             <?php if (count($reviews) > 0): ?>
-            <?php if (count($reviews) > 3): ?>
-            <!-- Reviews Slider -->
-            <div class="reviews-slider-wrapper">
-                <div class="reviews-slider" id="reviewsSlider">
-                    <?php foreach ($reviews as $review): ?>
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="review-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="review-info">
-                                <h4 class="review-name"><?php echo htmlspecialchars($review['client_name']); ?></h4>
-                                <div class="review-rating">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <?php if ($i <= $review['rating']): ?>
-                                            <i class="fas fa-star"></i>
-                                        <?php else: ?>
-                                            <i class="far fa-star"></i>
-                                        <?php endif; ?>
-                                    <?php endfor; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="review-text">"<?php echo htmlspecialchars($review['review_text']); ?>"</p>
-                        <div class="review-footer">
-                            <i class="fas fa-check-circle"></i>
-                            <span>عميل معتمد</span>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-
-                <button class="slider-nav slider-prev reviews-prev" onclick="slideReviews(-1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <button class="slider-nav slider-next reviews-next" onclick="slideReviews(1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <div class="slider-dots" id="reviewsSliderDots"></div>
-            </div>
-            <?php else: ?>
             <!-- Reviews Grid -->
             <div class="reviews-grid">
-                <?php foreach ($reviews as $review): ?>
+                <?php
+                $reviews_to_show = array_slice($reviews, 0, 6);
+                foreach ($reviews_to_show as $review):
+                ?>
                 <div class="review-card">
                     <div class="review-header">
                         <div class="review-avatar">
@@ -1053,6 +1014,13 @@ $social_youtube = getSetting('social_youtube', '');
                     </div>
                 </div>
                 <?php endforeach; ?>
+            </div>
+
+            <?php if (count($reviews) > 6): ?>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="reviews.php" class="btn btn-primary">
+                    <i class="fas fa-star"></i> عرض جميع التقييمات
+                </a>
             </div>
             <?php endif; ?>
             <?php else: ?>
@@ -1873,96 +1841,7 @@ $social_youtube = getSetting('social_youtube', '');
         }
     }
 
-    // Reviews Slider
-    const reviewsSliderEl = document.getElementById('reviewsSlider');
-    const reviewDotsContainer = document.getElementById('reviewsSliderDots');
-
-    if (reviewsSliderEl && reviewDotsContainer) {
-        let currentReviewSlide = 0;
-        const reviewCards = reviewsSliderEl.querySelectorAll('.review-card');
-        const totalReviews = reviewCards.length;
-
-        // Calculate cards per slide based on screen width
-        function getReviewsPerSlide() {
-            const width = window.innerWidth;
-            if (width <= 768) return 1;
-            if (width <= 1024) return 2;
-            return 3;
-        }
-
-        let reviewsPerSlide = getReviewsPerSlide();
-
-        // Create dots
-        function createReviewDots() {
-            reviewDotsContainer.innerHTML = '';
-            const pages = Math.ceil(totalReviews / reviewsPerSlide);
-
-            if (pages > 1) {
-                for (let i = 0; i < pages; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'slider-dot';
-                    if (i === 0) dot.classList.add('active');
-                    dot.onclick = () => goToReviewSlide(i);
-                    reviewDotsContainer.appendChild(dot);
-                }
-            }
-        }
-
-        createReviewDots();
-
-        function updateReviewSlider() {
-            // Calculate the width of each card plus gap
-            const cardWidth = reviewCards[0].offsetWidth;
-            const gap = 30; // Same as CSS gap
-            const slideWidth = cardWidth + gap;
-
-            // Calculate offset based on cards per slide
-            const offset = -currentReviewSlide * slideWidth * reviewsPerSlide;
-            reviewsSliderEl.style.transform = `translateX(${offset}px)`;
-
-            const dots = document.querySelectorAll('#reviewsSliderDots .slider-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentReviewSlide);
-            });
-        }
-
-        function goToReviewSlide(index) {
-            const pages = Math.ceil(totalReviews / reviewsPerSlide);
-            currentReviewSlide = Math.max(0, Math.min(index, pages - 1));
-            updateReviewSlider();
-        }
-
-        window.slideReviews = function(direction) {
-            const pages = Math.ceil(totalReviews / reviewsPerSlide);
-            currentReviewSlide = (currentReviewSlide + direction + pages) % pages;
-            updateReviewSlider();
-        };
-
-        // Handle window resize
-        let reviewResizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(reviewResizeTimer);
-            reviewResizeTimer = setTimeout(function() {
-                const newReviewsPerSlide = getReviewsPerSlide();
-                if (newReviewsPerSlide !== reviewsPerSlide) {
-                    reviewsPerSlide = newReviewsPerSlide;
-                    currentReviewSlide = 0;
-                    createReviewDots();
-                    updateReviewSlider();
-                }
-            }, 250);
-        });
-
-        // Initialize slider position
-        updateReviewSlider();
-
-        // Auto-slide every 5 seconds
-        if (totalReviews > reviewsPerSlide) {
-            setInterval(() => {
-                slideReviews(1);
-            }, 5000);
-        }
-    }
+    // Reviews are now displayed in grid, no slider needed
 
     // Auto-select package from URL or button click
     document.addEventListener('DOMContentLoaded', function() {

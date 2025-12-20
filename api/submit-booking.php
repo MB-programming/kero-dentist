@@ -1,10 +1,15 @@
 <?php
 header('Content-Type: application/json');
+
+// Use the dedicated booking database connection
+require_once 'booking-db-connection.php';
+
+// Also load main config to get package details
 require_once '../includes/config.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't display errors directly
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 // Check if request is POST
@@ -14,27 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // Ensure bookings table exists
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS bookings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            client_name VARCHAR(255) NOT NULL,
-            client_email VARCHAR(255),
-            client_address TEXT,
-            client_phone VARCHAR(50) NOT NULL,
-            client_whatsapp VARCHAR(50) NOT NULL,
-            booking_date DATE NOT NULL,
-            booking_time VARCHAR(20) NOT NULL,
-            booking_day VARCHAR(50),
-            package_id INT,
-            status VARCHAR(50) DEFAULT 'pending',
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_status (status),
-            INDEX idx_date (booking_date)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
     // Validate required fields
     $required_fields = ['client_name', 'client_phone', 'client_whatsapp', 'booking_date', 'booking_time', 'package_id'];
     foreach ($required_fields as $field) {
@@ -45,15 +29,44 @@ try {
     }
 
     // Sanitize inputs
-    $client_name = sanitize($_POST['client_name']);
-    $client_email = isset($_POST['client_email']) ? sanitize($_POST['client_email']) : '';
-    $client_phone = sanitize($_POST['client_phone']);
-    $client_whatsapp = sanitize($_POST['client_whatsapp']);
-    $client_address = isset($_POST['client_address']) ? sanitize($_POST['client_address']) : '';
-    $booking_date = sanitize($_POST['booking_date']);
-    $booking_time = sanitize($_POST['booking_time']);
-    $booking_day = isset($_POST['booking_day']) ? sanitize($_POST['booking_day']) : '';
+    $client_name = sanitize_booking_input($_POST['client_name']);
+    $client_email = isset($_POST['client_email']) ? sanitize_booking_input($_POST['client_email']) : '';
+    $client_phone = sanitize_booking_input($_POST['client_phone']);
+    $client_whatsapp = sanitize_booking_input($_POST['client_whatsapp']);
+    $client_address = isset($_POST['client_address']) ? sanitize_booking_input($_POST['client_address']) : '';
+    $booking_date = sanitize_booking_input($_POST['booking_date']);
+    $booking_time = sanitize_booking_input($_POST['booking_time']);
+    $booking_day = isset($_POST['booking_day']) ? sanitize_booking_input($_POST['booking_day']) : '';
     $package_id = intval($_POST['package_id']);
+
+    // Validate and detect phone carrier
+    $phone_validation = detect_phone_carrier($client_phone);
+    if (!$phone_validation['valid']) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'رقم الهاتف غير صحيح. يرجى إدخال رقم هاتف مصري صحيح يبدأ بـ 010، 011، 012، أو 015'
+        ]);
+        exit;
+    }
+
+    // Validate Egyptian mobile
+    if (!validate_egyptian_mobile($client_phone)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'رقم الهاتف يجب أن يكون رقم موبايل مصري (11 رقم يبدأ بـ 01)'
+        ]);
+        exit;
+    }
+
+    // Validate and detect WhatsApp carrier
+    $whatsapp_validation = detect_phone_carrier($client_whatsapp);
+    if (!$whatsapp_validation['valid']) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'رقم الواتساب غير صحيح. يرجى إدخال رقم واتساب مصري صحيح'
+        ]);
+        exit;
+    }
 
     // Validate date format
     $date_obj = DateTime::createFromFormat('Y-m-d', $booking_date);
@@ -74,7 +87,7 @@ try {
         $booking_day = $days[$date_obj->format('w')];
     }
 
-    // Verify package exists
+    // Get package details from main database
     $stmt = $conn->prepare("SELECT id, name, price FROM packages WHERE id = ? AND is_active = 1");
     $stmt->execute([$package_id]);
     $package = $stmt->fetch();
@@ -84,32 +97,44 @@ try {
         exit;
     }
 
-    // Insert booking
-    $stmt = $conn->prepare("
+    // Format phone numbers
+    $formatted_phone = $phone_validation['formatted'];
+    $formatted_whatsapp = $whatsapp_validation['formatted'];
+
+    // Insert booking into dedicated booking database
+    $stmt = $booking_conn->prepare("
         INSERT INTO bookings (
             client_name,
             client_email,
             client_address,
             client_phone,
+            client_phone_carrier,
             client_whatsapp,
+            client_whatsapp_carrier,
             booking_date,
             booking_time,
             booking_day,
             package_id,
+            package_name,
+            package_price,
             status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
 
     $success = $stmt->execute([
         $client_name,
         $client_email,
         $client_address,
-        $client_phone,
-        $client_whatsapp,
+        $formatted_phone,
+        $phone_validation['carrier'],
+        $formatted_whatsapp,
+        $whatsapp_validation['carrier'],
         $booking_date,
         $booking_time,
         $booking_day,
-        $package_id
+        $package_id,
+        $package['name'],
+        $package['price']
     ]);
 
     if (!$success) {
@@ -117,22 +142,27 @@ try {
         throw new Exception('فشل حفظ الحجز: ' . implode(' - ', $errorInfo));
     }
 
-    $booking_id = $conn->lastInsertId();
+    $booking_id = $booking_conn->lastInsertId();
 
-    // Build success message with booking details
+    // Build success message with booking details AND carrier info
     $success_msg = sprintf(
         "✅ تم تأكيد حجزك بنجاح!\n\n" .
         "📋 رقم الحجز: #%d\n" .
         "📅 التاريخ: %s\n" .
         "⏰ الموعد: %s\n" .
         "📦 الباقة: %s\n\n" .
-        "سنتواصل معك قريباً عبر واتساب على الرقم: %s\n" .
-        "يمكنك متابعة حالة حجزك من خلال التواصل معنا",
+        "📱 رقم الهاتف: %s (%s)\n" .
+        "💬 رقم الواتساب: %s (%s)\n\n" .
+        "سنتواصل معك قريباً عبر واتساب.\n" .
+        "يمكنك متابعة حالة حجزك من خلال التواصل معنا.",
         $booking_id,
         date('Y/m/d', strtotime($booking_date)),
         $booking_time,
         $package['name'],
-        $client_whatsapp
+        $formatted_phone,
+        $phone_validation['carrier'],
+        $formatted_whatsapp,
+        $whatsapp_validation['carrier']
     );
 
     echo json_encode([
@@ -143,7 +173,11 @@ try {
             'date' => $booking_date,
             'time' => $booking_time,
             'package' => $package['name'],
-            'package_price' => $package['price']
+            'package_price' => $package['price'],
+            'phone' => $formatted_phone,
+            'phone_carrier' => $phone_validation['carrier'],
+            'whatsapp' => $formatted_whatsapp,
+            'whatsapp_carrier' => $whatsapp_validation['carrier']
         ]
     ]);
 
