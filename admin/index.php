@@ -27,11 +27,10 @@ $approved_reviews = $stmt->fetchColumn();
 $stmt = $conn->query("SELECT COUNT(*) FROM services WHERE is_active = 1");
 $active_services = $stmt->fetchColumn();
 
-// Get recent bookings
+// Get recent bookings - package_name and package_price are already in bookings table
 $stmt = $conn->prepare("
-    SELECT b.*, p.name as package_name, p.price
+    SELECT b.*
     FROM bookings b
-    LEFT JOIN packages p ON b.package_id = p.id
     ORDER BY b.created_at DESC
     LIMIT 10
 ");

@@ -2,6 +2,9 @@
 $page_title = 'إدارة الحجوزات';
 include 'includes/header.php';
 
+// Note: bookings table is in the same database, so we use $conn
+// But the table structure has package_name and package_price directly
+
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $booking_id = intval($_POST['booking_id']);
@@ -61,11 +64,10 @@ $stmt->execute($params);
 $total_bookings = $stmt->fetchColumn();
 $total_pages = ceil($total_bookings / $per_page);
 
-// Fetch bookings
+// Fetch bookings - bookings table already has package_name and package_price
 $query = "
-    SELECT b.*, p.name as package_name, p.price
+    SELECT b.*
     FROM bookings b
-    LEFT JOIN packages p ON b.package_id = p.id
     $where_clause
     ORDER BY b.created_at DESC
     LIMIT ? OFFSET ?
@@ -169,9 +171,9 @@ $bookings = $stmt->fetchAll();
                         <td><?php echo htmlspecialchars($booking['client_phone']); ?></td>
                         <td><?php echo htmlspecialchars($booking['client_whatsapp']); ?></td>
                         <td>
-                            <?php echo htmlspecialchars($booking['package_name']); ?>
+                            <?php echo htmlspecialchars($booking['package_name'] ?? '-'); ?>
                             <br>
-                            <small style="color: var(--text-light);"><?php echo formatPrice($booking['price']); ?></small>
+                            <small style="color: var(--text-light);"><?php echo formatPrice($booking['package_price'] ?? 0); ?></small>
                         </td>
                         <td><?php echo formatDate($booking['booking_date']); ?></td>
                         <td><?php echo htmlspecialchars($booking['booking_time'] ?? '-'); ?></td>
@@ -389,8 +391,10 @@ function viewBooking(id) {
                         <tr><td style="padding: 10px; font-weight: bold;">العنوان:</td><td style="padding: 10px;">${booking.client_address || '-'}</td></tr>
                         <tr><td style="padding: 10px; font-weight: bold;">الهاتف:</td><td style="padding: 10px;">${booking.client_phone}</td></tr>
                         <tr><td style="padding: 10px; font-weight: bold;">واتساب:</td><td style="padding: 10px;">${booking.client_whatsapp}</td></tr>
-                        <tr><td style="padding: 10px; font-weight: bold;">الباقة:</td><td style="padding: 10px;">${booking.package_name}</td></tr>
-                        <tr><td style="padding: 10px; font-weight: bold;">السعر:</td><td style="padding: 10px;">${booking.price} جنيه</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold;">الباقة:</td><td style="padding: 10px;">${booking.package_name || '-'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold;">السعر:</td><td style="padding: 10px;">${booking.package_price || '-'} جنيه</td></tr>
+                        ${booking.client_phone_carrier ? `<tr><td style="padding: 10px; font-weight: bold;">شركة الهاتف:</td><td style="padding: 10px;">${booking.client_phone_carrier}</td></tr>` : ''}
+                        ${booking.client_whatsapp_carrier ? `<tr><td style="padding: 10px; font-weight: bold;">شركة الواتساب:</td><td style="padding: 10px;">${booking.client_whatsapp_carrier}</td></tr>` : ''}
                         <tr><td style="padding: 10px; font-weight: bold;">تاريخ الحجز:</td><td style="padding: 10px;">${booking.booking_date}</td></tr>
                         ${booking.booking_time ? `<tr><td style="padding: 10px; font-weight: bold;">وقت الحجز:</td><td style="padding: 10px;">${booking.booking_time}</td></tr>` : ''}
                         <tr><td style="padding: 10px; font-weight: bold;">اليوم:</td><td style="padding: 10px;">${booking.booking_day}</td></tr>
@@ -433,7 +437,7 @@ function approveBookingWhatsApp(booking) {
         body: formData
     }).then(() => {
         // Build WhatsApp approval message
-        const message = `مرحباً ${booking.client_name}،\n\n✅ تم الموافقة على حجزك!\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n💰 السعر: ${booking.price} جنيه\n📅 التاريخ: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n✨ نحن سعداء بخدمتك!\nيُرجى الحضور في الموعد المحدد.\n\nمع تحياتنا،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
+        const message = `مرحباً ${booking.client_name}،\n\n✅ تم الموافقة على حجزك!\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n💰 السعر: ${booking.package_price} جنيه\n📅 التاريخ: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n✨ نحن سعداء بخدمتك!\nيُرجى الحضور في الموعد المحدد.\n\nمع تحياتنا،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
 
         // Clean phone number and open WhatsApp
         const cleanNumber = booking.client_whatsapp.replace(/[^0-9]/g, '');
