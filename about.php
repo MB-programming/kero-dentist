@@ -467,18 +467,22 @@ $awards_count = getSetting('awards_count', '25+');
 
                 <div class="doctor-info-about">
                     <h2><?php echo htmlspecialchars($main_doctor['name']); ?></h2>
-                    <p class="specialty"><?php echo htmlspecialchars($main_doctor['specialty']); ?></p>
+                    <?php if (!empty($main_doctor['title'])): ?>
+                        <p class="specialty"><?php echo htmlspecialchars($main_doctor['title']); ?></p>
+                    <?php elseif (!empty($main_doctor['specialization'])): ?>
+                        <p class="specialty"><?php echo htmlspecialchars($main_doctor['specialization']); ?></p>
+                    <?php endif; ?>
 
                     <div class="bio">
                         <?php echo nl2br(htmlspecialchars($main_doctor['bio'])); ?>
                     </div>
 
                     <ul class="credentials-list">
-                        <?php if ($main_doctor['qualifications']): ?>
-                            <li><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($main_doctor['qualifications']); ?></li>
+                        <?php if (!empty($main_doctor['specialization'])): ?>
+                            <li><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($main_doctor['specialization']); ?></li>
                         <?php endif; ?>
-                        <?php if ($main_doctor['experience']): ?>
-                            <li><i class="fas fa-briefcase"></i> <?php echo htmlspecialchars($main_doctor['experience']); ?></li>
+                        <?php if (!empty($main_doctor['years_experience'])): ?>
+                            <li><i class="fas fa-briefcase"></i> <?php echo $main_doctor['years_experience']; ?> سنوات خبرة</li>
                         <?php endif; ?>
                         <?php if ($main_doctor['phone']): ?>
                             <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($main_doctor['phone']); ?></li>
@@ -606,9 +610,13 @@ $awards_count = getSetting('awards_count', '25+');
                     </div>
                     <div class="team-member-info">
                         <h3><?php echo htmlspecialchars($doctor['name']); ?></h3>
-                        <p class="role"><?php echo htmlspecialchars($doctor['specialty']); ?></p>
-                        <?php if ($doctor['qualifications']): ?>
-                            <p class="description"><?php echo htmlspecialchars($doctor['qualifications']); ?></p>
+                        <?php if (!empty($doctor['title'])): ?>
+                            <p class="role"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                        <?php elseif (!empty($doctor['specialization'])): ?>
+                            <p class="role"><?php echo htmlspecialchars($doctor['specialization']); ?></p>
+                        <?php endif; ?>
+                        <?php if (!empty($doctor['bio'])): ?>
+                            <p class="description"><?php echo htmlspecialchars(substr($doctor['bio'], 0, 100)) . '...'; ?></p>
                         <?php endif; ?>
                     </div>
                 </div>
