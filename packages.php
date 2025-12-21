@@ -14,7 +14,6 @@ try {
 $site_name = getSetting('site_name', 'عيادة الدكتور');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
-
 $site_logo = getSetting('site_logo', '');
 $social_facebook = getSetting('social_facebook', '');
 $social_instagram = getSetting('social_instagram', '');
@@ -26,7 +25,6 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
 // Page title for header
 $page_title = 'الباقات والأسعار';
 $page_description = 'تعرف على باقاتنا وأسعارنا المميزة لخدمات طب الأسنان';
-
 
 // Fetch menu items
 try {
@@ -45,30 +43,19 @@ try {
     $footer_menu = [];
 }
 ?>
-?>
 <?php include 'includes/header.php'; ?>
 
     <style>
-
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/main.css">
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
-
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .page-header-section {
+        .packages-hero {
             background: linear-gradient(135deg, rgba(0, 180, 216, 0.95), rgba(6, 214, 160, 0.95));
             color: white;
-            padding: 100px 0 80px;
+            padding: 120px 0 80px;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .page-header-section::before {
+        .packages-hero::before {
             content: '';
             position: absolute;
             top: 0;
@@ -78,129 +65,106 @@ try {
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
             background-size: cover;
             background-position: bottom;
-            opacity: 0.3;
         }
 
-        .page-header-content {
+        .hero-content {
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .page-header-section h1 {
+        .hero-content h1 {
             font-size: 3.5rem;
             font-weight: 900;
             margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .page-header-section p {
+        .hero-content p {
             font-size: 1.3rem;
             opacity: 0.95;
-            max-width: 700px;
-            margin: 0 auto;
         }
 
         .packages-section {
             padding: 80px 0;
-            background: #f8f9fa;
-        }
-
-        .section-intro {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 60px;
-        }
-
-        .section-intro h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #1a1a1a;
-            margin-bottom: 20px;
-        }
-
-        .section-intro p {
-            font-size: 1.2rem;
-            color: #666;
-            line-height: 1.8;
         }
 
         .packages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
         }
 
         .package-card {
             background: white;
             border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            position: relative;
             overflow: hidden;
-        }
-
-        .package-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
         }
 
         .package-card.popular {
-            border: 3px solid var(--accent-color);
+            border-color: var(--accent-color);
             transform: scale(1.05);
         }
 
-        .package-card.popular::before {
-            content: 'الأكثر طلباً';
-            position: absolute;
-            top: 20px;
-            left: -35px;
-            background: var(--accent-color);
-            color: white;
-            padding: 5px 40px;
-            transform: rotate(-45deg);
-            font-size: 0.85rem;
-            font-weight: 700;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .package-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .package-card.popular:hover {
+            transform: translateY(-10px) scale(1.07);
         }
 
         .package-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 40px 30px;
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+
+        .package-card.popular .package-header::before {
+            content: 'الأكثر طلباً';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .package-name {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
-            color: var(--primary-color);
             margin-bottom: 15px;
         }
 
         .package-price {
             font-size: 3rem;
             font-weight: 900;
-            color: var(--accent-color);
-            line-height: 1;
+            margin-bottom: 10px;
         }
 
         .package-price small {
-            font-size: 1rem;
-            color: #999;
-            font-weight: 400;
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
 
         .package-duration {
-            color: #666;
-            font-size: 0.95rem;
-            margin-top: 10px;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .package-body {
+            padding: 40px 30px;
         }
 
         .package-description {
             color: #666;
-            font-size: 1rem;
             line-height: 1.8;
             margin-bottom: 25px;
             text-align: center;
@@ -209,38 +173,43 @@ try {
         .package-features {
             list-style: none;
             padding: 0;
-            margin: 25px 0;
+            margin: 0 0 30px 0;
         }
 
         .package-features li {
-            padding: 12px 0;
-            color: #333;
-            font-size: 1rem;
             display: flex;
             align-items: center;
-            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .package-features li i {
+        .package-features li:last-child {
+            border-bottom: none;
+        }
+
+        .package-features i {
             color: var(--accent-color);
-            font-size: 1.1rem;
-            flex-shrink: 0;
+            margin-left: 12px;
+            font-size: 1.2rem;
+        }
+
+        .package-features span {
+            flex: 1;
+            color: #444;
         }
 
         .package-btn {
+            display: block;
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
             text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
         }
 
         .package-btn:hover {
@@ -248,15 +217,23 @@ try {
             box-shadow: 0 10px 30px rgba(0, 180, 216, 0.3);
         }
 
-        .package-card.popular .package-btn {
-            background: linear-gradient(135deg, var(--accent-color), #06c494);
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         .cta-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             padding: 80px 0;
             text-align: center;
+            color: white;
         }
 
         .cta-section h2 {
@@ -271,29 +248,26 @@ try {
             opacity: 0.95;
         }
 
-        .cta-btn {
+        .cta-section a {
+            display: inline-block;
             background: white;
-            color: var(--primary-color);
+            color: var(--primary);
             padding: 18px 50px;
+            border-radius: 50px;
             font-size: 1.2rem;
             font-weight: 700;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
+            transition: all 0.3s ease;
         }
 
-        .cta-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        .cta-section a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         @media (max-width: 768px) {
-            .page-header-section h1 {
-                font-size: 2.2rem;
+            .hero-content h1 {
+                font-size: 2.5rem;
             }
 
             .packages-grid {
@@ -303,28 +277,24 @@ try {
             .package-card.popular {
                 transform: scale(1);
             }
+
+            .package-card.popular:hover {
+                transform: translateY(-10px) scale(1.02);
+            }
         }
     </style>
-    <!-- Include Header -->
 
-    <!-- Page Header -->
-    <section class="page-header-section">
-        <div class="page-header-content">
-            <div class="container">
-                <h1><i class="fas fa-box-open"></i> الباقات والأسعار</h1>
-                <p>اختر الباقة المناسبة لك من بين مجموعة متنوعة من العروض والخدمات المميزة</p>
-            </div>
+    <!-- Hero Section -->
+    <section class="packages-hero">
+        <div class="hero-content">
+            <h1>الباقات والأسعار</h1>
+            <p>اختر الباقة المناسبة لك واحصل على أفضل العروض</p>
         </div>
     </section>
 
     <!-- Packages Section -->
     <section class="packages-section">
         <div class="container">
-            <div class="section-intro">
-                <h2>اختر الباقة المناسبة لك</h2>
-                <p>نقدم لك مجموعة متنوعة من الباقات الطبية المصممة خصيصاً لتلبية احتياجاتك. جميع الباقات تشمل استشارة مجانية وضمان على الخدمات المقدمة.</p>
-            </div>
-
             <?php if (count($packages) > 0): ?>
             <div class="packages-grid">
                 <?php foreach ($packages as $package): ?>
@@ -335,23 +305,21 @@ try {
                             <?php echo number_format($package['price'], 0); ?> <small>جنيه</small>
                         </div>
                         <?php if (!empty($package['duration'])): ?>
-                            <div class="package-duration">
-                                <i class="fas fa-clock"></i> <?php echo htmlspecialchars($package['duration']); ?>
-                            </div>
+                        <div class="package-duration"><?php echo htmlspecialchars($package['duration']); ?></div>
                         <?php endif; ?>
                     </div>
-
-                    <?php if (!empty($package['description'])): ?>
+                    
+                    <div class="package-body">
+                        <?php if (!empty($package['description'])): ?>
                         <p class="package-description"><?php echo htmlspecialchars($package['description']); ?></p>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
-                    <?php if (!empty($package['features'])): ?>
+                        <?php if (!empty($package['features'])): ?>
                         <ul class="package-features">
                             <?php
                             $features = explode("\n", $package['features']);
                             foreach ($features as $feature):
-                                $feature = trim($feature);
-                                if (!empty($feature)):
+                                if (!empty(trim($feature))):
                             ?>
                                 <li>
                                     <i class="fas fa-check-circle"></i>
@@ -362,20 +330,20 @@ try {
                             endforeach;
                             ?>
                         </ul>
-                    <?php endif; ?>
-
-                    <a href="index.php#booking" class="package-btn">
-                        <i class="fas fa-calendar-check"></i> احجز الآن
-                    </a>
+                        <?php endif; ?>
+                        
+                        <a href="index.php#booking" class="package-btn">
+                            <i class="fas fa-calendar-check"></i> احجز الآن
+                        </a>
+                    </div>
                 </div>
                 <?php endforeach; ?>
             </div>
             <?php else: ?>
-                <div style="text-align: center; padding: 80px 20px;">
-                    <i class="fas fa-box-open" style="font-size: 5rem; color: #ddd; margin-bottom: 20px;"></i>
-                    <h3 style="color: #999; font-size: 1.5rem;">لا توجد باقات متاحة حالياً</h3>
-                    <p style="color: #bbb; margin-top: 10px;">نعمل على إضافة باقات جديدة قريباً</p>
-                </div>
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>لا توجد باقات متاحة حالياً</p>
+            </div>
             <?php endif; ?>
         </div>
     </section>
@@ -383,9 +351,9 @@ try {
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
-            <h2>هل أنت مستعد للبدء؟</h2>
-            <p>احجز موعدك الآن واحصل على استشارة مجانية</p>
-            <a href="index.php#booking" class="cta-btn">
+            <h2>هل لديك استفسار؟</h2>
+            <p>تواصل معنا الآن للحصول على استشارة مجانية</p>
+            <a href="index.php#booking">
                 <i class="fas fa-calendar-check"></i> احجز موعدك الآن
             </a>
             <div style="margin-top: 30px;">
@@ -395,7 +363,5 @@ try {
             </div>
         </div>
     </section>
-
-    <!-- Include Footer -->
 
 <?php include 'includes/footer.php'; ?>

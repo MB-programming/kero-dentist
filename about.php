@@ -33,7 +33,6 @@ $contact_email = getSetting('contact_email', '');
 $contact_address = getSetting('contact_address', '');
 $working_hours = getSetting('working_hours', '');
 $site_favicon = getSetting('site_favicon', '');
-
 $doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً في مجال طب الأسنان');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
@@ -42,7 +41,6 @@ $site_address = getSetting('site_address', 'القاهرة، مصر');
 // Page title for header
 $page_title = 'عن الدكتور';
 $page_description = 'تعرف على فريقنا الطبي المتميز وخبراتنا في مجال طب الأسنان';
-
 
 // Fetch specialties
 try {
@@ -53,29 +51,19 @@ try {
     $specialties = [];
 }
 
-// Fetch statistics/achievements
-$total_patients = getSetting('total_patients', '5000+');
+// Statistics
+$patients_count = getSetting('patients_count', '5000+');
 $years_experience = getSetting('years_experience', '15+');
 $success_rate = getSetting('success_rate', '98%');
 $awards_count = getSetting('awards_count', '25+');
 ?>
-?>
 <?php include 'includes/header.php'; ?>
 
     <style>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/modern-frontend.css">
-
-    <style>
-        /* About Page Specific Styles */
+        /* Modern About Page Styles */
         .about-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 140px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 120px 0 100px;
             position: relative;
             overflow: hidden;
         }
@@ -87,361 +75,545 @@ $awards_count = getSetting('awards_count', '25+');
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,144C672,139,768,149,864,154.7C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,144C672,139,768,149,864,154.7C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
             background-size: cover;
-            opacity: 0.3;
         }
 
-        .about-hero-content {
+        .hero-content {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             text-align: center;
             color: white;
         }
 
-        .about-hero-title {
+        .hero-title {
             font-size: 3.5rem;
             font-weight: 900;
             margin-bottom: 20px;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
         }
 
-        .about-hero-subtitle {
+        .hero-subtitle {
             font-size: 1.3rem;
-            opacity: 0.95;
             max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.8;
+            margin: 0 auto 40px;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease;
         }
 
-        .about-section {
-            padding: 80px 0;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .about-section.light {
-            background: #f8f9fa;
-        }
-
-        .doctor-profile-about {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .doctor-image-wrapper {
+        /* Stats Section */
+        .stats-section {
+            margin-top: -60px;
             position: relative;
-        }
-
-        .doctor-main-image {
-            width: 100%;
-            max-width: 450px;
-            height: 500px;
-            border-radius: 30px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            position: relative;
-        }
-
-        .doctor-main-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .doctor-main-image::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 35px;
-            z-index: -1;
-        }
-
-        .doctor-info-about h2 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .doctor-info-about .specialty {
-            font-size: 1.3rem;
-            color: var(--accent);
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .doctor-info-about .bio {
-            font-size: 1.1rem;
-            line-height: 2;
-            color: #4a5568;
-            margin-bottom: 30px;
-        }
-
-        .credentials-list {
-            list-style: none;
-            padding: 0;
-            margin: 30px 0;
-        }
-
-        .credentials-list li {
-            padding: 15px 0;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 1.05rem;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .credentials-list li i {
-            color: var(--primary);
-            font-size: 1.3rem;
-            min-width: 30px;
+            z-index: 3;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 30px;
-            margin-top: 60px;
         }
 
         .stat-card {
-            text-align: center;
-            padding: 40px 20px;
             background: white;
+            padding: 40px 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
         }
 
-        .stat-card i {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 20px;
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 900;
-            color: var(--primary);
+            color: #667eea;
             margin-bottom: 10px;
         }
 
         .stat-label {
             font-size: 1.1rem;
-            color: #64748b;
+            color: #666;
             font-weight: 600;
         }
 
-        .mission-vision-grid {
+        /* About Content Section */
+        .about-content-section {
+            padding: 100px 0;
+        }
+
+        .about-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            margin-top: 50px;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
         }
 
-        .mission-card {
-            background: white;
-            padding: 50px;
-            border-radius: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        .about-image-wrapper {
             position: relative;
-            overflow: hidden;
         }
 
-        .mission-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        .about-main-image {
             width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            height: 600px;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+            position: relative;
         }
 
-        .mission-card i {
-            font-size: 3.5rem;
-            color: var(--primary);
-            margin-bottom: 25px;
-            opacity: 0.1;
+        .about-main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-badge {
             position: absolute;
-            top: 20px;
-            right: 30px;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .mission-card h3 {
-            font-size: 2rem;
-            color: var(--primary);
+        .about-text h2 {
+            font-size: 2.8rem;
+            font-weight: 900;
             margin-bottom: 20px;
-            position: relative;
+            color: #2d3748;
         }
 
-        .mission-card p {
+        .about-text h3 {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .about-text p {
             font-size: 1.1rem;
-            line-height: 1.9;
-            color: #4a5568;
-            position: relative;
+            line-height: 2;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            font-size: 1.1rem;
+            color: #444;
+        }
+
+        .features-list li i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+        }
+
+        /* Team Section */
+        .team-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #666;
         }
 
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 35px;
-            margin-top: 50px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
         }
 
-        .team-member-card {
+        .team-card {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            transition: all 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .team-member-card:hover {
+        .team-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
         }
 
-        .team-member-image {
+        .team-image {
             width: 100%;
             height: 350px;
             overflow: hidden;
             position: relative;
         }
 
-        .team-member-image img {
+        .team-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: all 0.5s ease;
+            transition: transform 0.5s ease;
         }
 
-        .team-member-card:hover .team-member-image img {
+        .team-card:hover .team-image img {
             transform: scale(1.1);
         }
 
-        .team-member-info {
+        .team-info {
             padding: 30px;
             text-align: center;
         }
 
-        .team-member-info h3 {
+        .team-name {
             font-size: 1.5rem;
-            color: var(--primary);
+            font-weight: 800;
+            color: #2d3748;
             margin-bottom: 10px;
         }
 
-        .team-member-info .role {
-            color: var(--accent);
+        .team-role {
+            color: #667eea;
             font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .team-bio {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .team-social {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .team-social a {
+            width: 40px;
+            height: 40px;
+            background: #f5f7fa;
+            color: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .team-social a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Specialties Section */
+        .specialties-section {
+            padding: 100px 0;
+        }
+
+        .specialties-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .specialty-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .specialty-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+        }
+
+        .specialty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .specialty-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #2d3748;
             margin-bottom: 15px;
         }
 
-        .team-member-info .description {
-            color: #64748b;
-            line-height: 1.7;
-            font-size: 0.95rem;
+        .specialty-desc {
+            color: #666;
+            line-height: 1.8;
         }
 
-        @media (max-width: 1024px) {
-            .doctor-profile-about {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
 
+        .cta-section h2 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 992px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .mission-vision-grid {
+            .about-grid {
                 grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .specialties-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .about-hero-title {
+            .hero-title {
                 font-size: 2.5rem;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
             }
 
-            .mission-card {
-                padding: 35px;
+            .team-grid,
+            .specialties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-text h2 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
             }
         }
     </style>
-    <!-- Modern Navbar -->
 
     <!-- Hero Section -->
     <section class="about-hero">
         <div class="container">
-            <div class="about-hero-content">
-                <h1 class="about-hero-title">عن <?php echo htmlspecialchars($site_name); ?></h1>
-                <p class="about-hero-subtitle">نحن نؤمن بأن الابتسامة الجميلة هي مفتاح الثقة والسعادة. منذ سنوات ونحن نقدم أفضل خدمات طب الأسنان بأحدث التقنيات</p>
+            <div class="hero-content">
+                <h1 class="hero-title">من نحن</h1>
+                <p class="hero-subtitle">نحن نؤمن بأن الابتسامة الجميلة هي مفتاح الثقة والسعادة. منذ سنوات ونحن نقدم أفضل خدمات طب الأسنان بأحدث التقنيات العالمية</p>
             </div>
         </div>
     </section>
 
-    <!-- Main Doctor Profile -->
-    <?php if ($main_doctor): ?>
-    <section class="about-section">
+    <!-- Stats Section -->
+    <section class="stats-section">
         <div class="container">
-            <div class="doctor-profile-about">
-                <div class="doctor-image-wrapper">
-                    <div class="doctor-main-image">
-                        <?php if ($main_doctor['image']): ?>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number"><?php echo htmlspecialchars($patients_count); ?></div>
+                    <div class="stat-label">عميل سعيد</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-number"><?php echo htmlspecialchars($years_experience); ?></div>
+                    <div class="stat-label">سنوات الخبرة</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="stat-number"><?php echo htmlspecialchars($success_rate); ?></div>
+                    <div class="stat-label">نسبة النجاح</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="stat-number"><?php echo htmlspecialchars($awards_count); ?></div>
+                    <div class="stat-label">جائزة وتكريم</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Content Section -->
+    <?php if ($main_doctor): ?>
+    <section class="about-content-section">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image-wrapper">
+                    <div class="about-main-image">
+                        <?php if (!empty($main_doctor['image'])): ?>
                             <img src="<?php echo UPLOAD_URL . htmlspecialchars($main_doctor['image']); ?>" alt="<?php echo htmlspecialchars($main_doctor['name']); ?>">
                         <?php else: ?>
-                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-user-md" style="font-size: 120px; color: white; opacity: 0.3;"></i>
-                            </div>
+                            <img src="https://via.placeholder.com/600x800/667eea/ffffff?text=Doctor" alt="Doctor">
+                        <?php endif; ?>
+                        <?php if (!empty($main_doctor['years_experience'])): ?>
+                        <div class="image-badge">
+                            <i class="fas fa-award"></i> <?php echo $main_doctor['years_experience']; ?> سنة خبرة
+                        </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="doctor-info-about">
-                    <h2><?php echo htmlspecialchars($main_doctor['name']); ?></h2>
+                <div class="about-text">
+                    <h2><?php echo htmlspecialchars($main_doctor['name'] ?? $site_name); ?></h2>
                     <?php if (!empty($main_doctor['title'])): ?>
-                        <p class="specialty"><?php echo htmlspecialchars($main_doctor['title']); ?></p>
+                    <h3><?php echo htmlspecialchars($main_doctor['title']); ?></h3>
                     <?php elseif (!empty($main_doctor['specialization'])): ?>
-                        <p class="specialty"><?php echo htmlspecialchars($main_doctor['specialization']); ?></p>
+                    <h3><?php echo htmlspecialchars($main_doctor['specialization']); ?></h3>
                     <?php endif; ?>
 
-                    <div class="bio">
-                        <?php echo nl2br(htmlspecialchars($main_doctor['bio'])); ?>
-                    </div>
+                    <?php if (!empty($main_doctor['bio'])): ?>
+                    <p><?php echo nl2br(htmlspecialchars($main_doctor['bio'])); ?></p>
+                    <?php endif; ?>
 
-                    <ul class="credentials-list">
+                    <ul class="features-list">
                         <?php if (!empty($main_doctor['specialization'])): ?>
-                            <li><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($main_doctor['specialization']); ?></li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>تخصص في <?php echo htmlspecialchars($main_doctor['specialization']); ?></span>
+                        </li>
                         <?php endif; ?>
                         <?php if (!empty($main_doctor['years_experience'])): ?>
-                            <li><i class="fas fa-briefcase"></i> <?php echo $main_doctor['years_experience']; ?> سنوات خبرة</li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span><?php echo $main_doctor['years_experience']; ?> سنوات من الخبرة المتميزة</span>
+                        </li>
                         <?php endif; ?>
-                        <?php if ($main_doctor['phone']): ?>
-                            <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($main_doctor['phone']); ?></li>
-                        <?php endif; ?>
-                        <?php if ($main_doctor['email']): ?>
-                            <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($main_doctor['email']); ?></li>
-                        <?php endif; ?>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>استخدام أحدث التقنيات العالمية</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>رعاية صحية شاملة ومتكاملة</span>
+                        </li>
                     </ul>
 
-                    <a href="index.php#booking" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">
-                        <i class="fas fa-calendar-check"></i> احجز موعد الآن
+                    <a href="index.php#booking" class="cta-button">
+                        <i class="fas fa-calendar-check"></i> احجز موعدك الآن
                     </a>
                 </div>
             </div>
@@ -449,84 +621,26 @@ $awards_count = getSetting('awards_count', '25+');
     </section>
     <?php endif; ?>
 
-    <!-- Statistics Section -->
-    <section class="about-section light">
-        <div class="container">
-            <div class="modern-section-header">
-                <span class="modern-section-badge">إنجازاتنا</span>
-                <h2 class="modern-section-title">أرقام تتحدث عن نفسها</h2>
-                <p class="modern-section-subtitle">نفخر بثقة عملائنا وإنجازاتنا على مدار السنوات</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <div class="stat-number"><?php echo htmlspecialchars($total_patients); ?></div>
-                    <div class="stat-label">مريض سعيد</div>
-                </div>
-
-                <div class="stat-card">
-                    <i class="fas fa-award"></i>
-                    <div class="stat-number"><?php echo htmlspecialchars($years_experience); ?></div>
-                    <div class="stat-label">سنوات خبرة</div>
-                </div>
-
-                <div class="stat-card">
-                    <i class="fas fa-chart-line"></i>
-                    <div class="stat-number"><?php echo htmlspecialchars($success_rate); ?></div>
-                    <div class="stat-label">نسبة النجاح</div>
-                </div>
-
-                <div class="stat-card">
-                    <i class="fas fa-trophy"></i>
-                    <div class="stat-number"><?php echo htmlspecialchars($awards_count); ?></div>
-                    <div class="stat-label">جائزة وتقدير</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Mission & Vision -->
-    <section class="about-section">
-        <div class="container">
-            <div class="modern-section-header">
-                <span class="modern-section-badge">رؤيتنا ورسالتنا</span>
-                <h2 class="modern-section-title">ما نؤمن به</h2>
-            </div>
-
-            <div class="mission-vision-grid">
-                <div class="mission-card">
-                    <i class="fas fa-bullseye"></i>
-                    <h3>رسالتنا</h3>
-                    <p>نلتزم بتقديم أفضل خدمات طب الأسنان باستخدام أحدث التقنيات والمعدات الطبية، مع التركيز على راحة المريض وتحقيق أفضل النتائج. نسعى لجعل تجربة زيارة طبيب الأسنان مريحة وممتعة لجميع أفراد العائلة.</p>
-                </div>
-
-                <div class="mission-card">
-                    <i class="fas fa-eye"></i>
-                    <h3>رؤيتنا</h3>
-                    <p>نطمح لأن نكون الخيار الأول في مجال طب الأسنان في المنطقة، من خلال تقديم خدمات متميزة تجمع بين الجودة العالية والأسعار المناسبة. نهدف إلى نشر الوعي بأهمية صحة الفم والأسنان في المجتمع.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Specialties Section -->
     <?php if (count($specialties) > 0): ?>
-    <section class="about-section light">
+    <section class="specialties-section">
         <div class="container">
-            <div class="modern-section-header">
-                <span class="modern-section-badge">تخصصاتنا</span>
-                <h2 class="modern-section-title">مجالات خبرتنا</h2>
+            <div class="section-header">
+                <span class="section-badge">تخصصاتنا</span>
+                <h2 class="section-title">المجالات التي نتميز فيها</h2>
+                <p class="section-subtitle">نقدم خدمات متخصصة في جميع مجالات طب الأسنان</p>
             </div>
 
-            <div class="spec-grid">
+            <div class="specialties-grid">
                 <?php foreach ($specialties as $specialty): ?>
-                <div class="spec-card">
-                    <div class="spec-icon">
-                        <i class="fas <?php echo htmlspecialchars($specialty['icon']); ?>"></i>
+                <div class="specialty-card">
+                    <div class="specialty-icon">
+                        <i class="fas <?php echo htmlspecialchars($specialty['icon'] ?? 'fa-tooth'); ?>"></i>
                     </div>
-                    <h3 class="spec-title"><?php echo htmlspecialchars($specialty['title']); ?></h3>
-                    <p class="spec-desc"><?php echo htmlspecialchars($specialty['description']); ?></p>
+                    <h3 class="specialty-title"><?php echo htmlspecialchars($specialty['title']); ?></h3>
+                    <?php if (!empty($specialty['description'])): ?>
+                    <p class="specialty-desc"><?php echo htmlspecialchars($specialty['description']); ?></p>
+                    <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -536,35 +650,53 @@ $awards_count = getSetting('awards_count', '25+');
 
     <!-- Team Section -->
     <?php if (count($all_doctors) > 1): ?>
-    <section class="about-section">
+    <section class="team-section">
         <div class="container">
-            <div class="modern-section-header">
-                <span class="modern-section-badge">فريق العمل</span>
-                <h2 class="modern-section-title">تعرف على أطبائنا</h2>
-                <p class="modern-section-subtitle">فريق من الخبراء المتخصصين في مختلف مجالات طب الأسنان</p>
+            <div class="section-header">
+                <span class="section-badge">فريقنا الطبي</span>
+                <h2 class="section-title">تعرف على فريق الأطباء</h2>
+                <p class="section-subtitle">نخبة من الأطباء المتخصصين ذوي الخبرة الواسعة</p>
             </div>
 
             <div class="team-grid">
                 <?php foreach ($all_doctors as $doctor): ?>
-                <div class="team-member-card">
-                    <div class="team-member-image">
-                        <?php if ($doctor['image']): ?>
+                <div class="team-card">
+                    <div class="team-image">
+                        <?php if (!empty($doctor['image'])): ?>
                             <img src="<?php echo UPLOAD_URL . htmlspecialchars($doctor['image']); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                         <?php else: ?>
-                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-user-md" style="font-size: 80px; color: white; opacity: 0.3;"></i>
-                            </div>
+                            <img src="https://via.placeholder.com/400x500/667eea/ffffff?text=<?php echo urlencode($doctor['name']); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                         <?php endif; ?>
                     </div>
-                    <div class="team-member-info">
-                        <h3><?php echo htmlspecialchars($doctor['name']); ?></h3>
+                    <div class="team-info">
+                        <h3 class="team-name"><?php echo htmlspecialchars($doctor['name']); ?></h3>
                         <?php if (!empty($doctor['title'])): ?>
-                            <p class="role"><?php echo htmlspecialchars($doctor['title']); ?></p>
+                        <p class="team-role"><?php echo htmlspecialchars($doctor['title']); ?></p>
                         <?php elseif (!empty($doctor['specialization'])): ?>
-                            <p class="role"><?php echo htmlspecialchars($doctor['specialization']); ?></p>
+                        <p class="team-role"><?php echo htmlspecialchars($doctor['specialization']); ?></p>
                         <?php endif; ?>
                         <?php if (!empty($doctor['bio'])): ?>
-                            <p class="description"><?php echo htmlspecialchars(substr($doctor['bio'], 0, 100)) . '...'; ?></p>
+                        <p class="team-bio"><?php echo htmlspecialchars(substr($doctor['bio'], 0, 120)) . '...'; ?></p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($doctor['facebook']) || !empty($doctor['instagram']) || !empty($doctor['twitter'])): ?>
+                        <div class="team-social">
+                            <?php if (!empty($doctor['facebook'])): ?>
+                            <a href="<?php echo htmlspecialchars($doctor['facebook']); ?>" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <?php endif; ?>
+                            <?php if (!empty($doctor['instagram'])): ?>
+                            <a href="<?php echo htmlspecialchars($doctor['instagram']); ?>" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <?php endif; ?>
+                            <?php if (!empty($doctor['twitter'])): ?>
+                            <a href="<?php echo htmlspecialchars($doctor['twitter']); ?>" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <?php endif; ?>
+                        </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -575,12 +707,12 @@ $awards_count = getSetting('awards_count', '25+');
     <?php endif; ?>
 
     <!-- CTA Section -->
-    <section class="about-section" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; text-align: center;">
+    <section class="cta-section">
         <div class="container">
-            <h2 style="font-size: 2.5rem; margin-bottom: 25px; color: white;">هل أنت مستعد لابتسامة أجمل؟</h2>
-            <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.95;">احجز موعدك الآن واحصل على استشارة مجانية</p>
-            <a href="index.php#booking" class="btn" style="background: white; color: var(--primary); padding: 18px 50px; font-size: 1.2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                <i class="fas fa-calendar-check"></i> احجز موعد الآن
+            <h2>جاهز لتحصل على ابتسامة أحلامك؟</h2>
+            <p>احجز موعدك الآن واستمتع بخدمة طبية متميزة</p>
+            <a href="index.php#booking" class="cta-button">
+                <i class="fas fa-calendar-check"></i> احجز الآن
             </a>
         </div>
     </section>
