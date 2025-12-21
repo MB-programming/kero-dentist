@@ -363,6 +363,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Auto-Update Reviews Settings -->
+    <div class="card">
+        <div class="card-header" style="background: #fef3c7;">
+            <h2 style="color: #d97706;"><i class="fas fa-sync-alt"></i> التحديث التلقائي للتقييمات (كل 3 أيام)</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>تحديث تلقائي كل 3 أيام</strong><br>
+                اختر طريقة جلب التقييمات الجديدة تلقائياً من Google Maps
+            </div>
+
+            <div class="form-group">
+                <label><strong>طريقة التحديث التلقائي</strong></label>
+                <select name="review_update_method" class="form-control">
+                    <option value="disabled" <?php echo getSetting('review_update_method') === 'disabled' ? 'selected' : ''; ?>>معطّل (يدوي فقط)</option>
+                    <option value="outscraper" <?php echo getSetting('review_update_method') === 'outscraper' ? 'selected' : ''; ?>>Outscraper API (موصى به)</option>
+                    <option value="sheets" <?php echo getSetting('review_update_method') === 'sheets' ? 'selected' : ''; ?>>Google Sheets CSV</option>
+                </select>
+            </div>
+
+            <hr style="margin: 30px 0;">
+
+            <!-- Outscraper Settings -->
+            <h3 style="color: #0ea5e9; margin-bottom: 15px;">
+                <i class="fas fa-robot"></i> إعدادات Outscraper API
+            </h3>
+
+            <div class="alert" style="background: #e0f2fe; border-left: 4px solid #0ea5e9;">
+                <strong>💡 مجاني: 100 request شهرياً</strong><br>
+                1. سجل حساب في: <a href="https://app.outscraper.com/signup" target="_blank">Outscraper.com</a><br>
+                2. احصل على API Key من: <a href="https://app.outscraper.com/api-settings" target="_blank">API Settings</a><br>
+                3. الصق المفتاح هنا ⬇️
+            </div>
+
+            <div class="form-group">
+                <label>Outscraper API Key</label>
+                <input type="text" name="outscraper_api_key" value="<?php echo htmlspecialchars(getSetting('outscraper_api_key')); ?>" placeholder="YourOutscraperApiKey...">
+                <small class="form-text">سيجلب تلقائياً جميع التقييمات الجديدة كل 3 أيام</small>
+            </div>
+
+            <hr style="margin: 30px 0;">
+
+            <!-- Google Sheets Settings -->
+            <h3 style="color: #10b981; margin-bottom: 15px;">
+                <i class="fas fa-table"></i> إعدادات Google Sheets
+            </h3>
+
+            <div class="alert" style="background: #f0fdf4; border-left: 4px solid #10b981;">
+                <strong>✅ مجاني 100%</strong><br>
+                1. أنشئ Google Sheet واستخدم Google Apps Script لجلب التقييمات<br>
+                2. اجعل الشيت عام (Share > Anyone with the link can view)<br>
+                3. صدّره كـ CSV واحصل على الرابط<br>
+                4. الصق رابط CSV هنا ⬇️
+            </div>
+
+            <div class="form-group">
+                <label>رابط Google Sheets CSV</label>
+                <input type="url" name="reviews_sheet_csv_url" value="<?php echo htmlspecialchars(getSetting('reviews_sheet_csv_url')); ?>" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv">
+                <small class="form-text">رابط التصدير المباشر للـ CSV من Google Sheets</small>
+            </div>
+
+            <hr style="margin: 30px 0;">
+
+            <!-- Cron Job Instructions -->
+            <div style="padding: 20px; background: #f8fafc; border-radius: 12px; border: 2px dashed #cbd5e0;">
+                <h3 style="color: #64748b; margin-bottom: 15px;">
+                    <i class="fas fa-terminal"></i> تفعيل Cron Job (للتحديث التلقائي)
+                </h3>
+                <p style="color: #64748b; margin-bottom: 15px;">أضف هذا السطر لـ crontab لتشغيل التحديث كل 3 أيام:</p>
+                <pre style="background: #1e293b; color: #10b981; padding: 15px; border-radius: 8px; overflow-x: auto;">0 2 */3 * * /usr/bin/php /home/user/kero-dentist/cron/auto_update_reviews.php >> /home/user/kero-dentist/cron/reviews_update.log 2>&1</pre>
+                <p style="color: #64748b; margin-top: 15px; margin-bottom: 0;">
+                    <strong>الشرح:</strong><br>
+                    • يعمل كل 3 أيام في الساعة 2 صباحاً<br>
+                    • يحفظ النتائج في ملف log<br>
+                    • راجع الملف: <code>/home/user/kero-dentist/cron/reviews_update.log</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- SMTP Email Settings -->
     <div class="card">
         <div class="card-header">
