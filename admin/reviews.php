@@ -37,10 +37,17 @@ if ($filter === 'pending') {
     $where = 'WHERE is_approved = 0';
 } elseif ($filter === 'approved') {
     $where = 'WHERE is_approved = 1';
+} elseif ($filter === 'website') {
+    $where = "WHERE source = 'email'";
+} elseif ($filter === 'google') {
+    $where = "WHERE source = 'google'";
 }
 
 $stmt = $conn->query("SELECT * FROM reviews $where ORDER BY created_at DESC");
 $reviews = $stmt->fetchAll();
+
+// Count pending website reviews
+$pending_website_count = $conn->query("SELECT COUNT(*) FROM reviews WHERE is_approved = 0 AND source = 'email'")->fetchColumn();
 ?>
 
 <div class="page-header">
@@ -64,10 +71,27 @@ $reviews = $stmt->fetchAll();
     </div>
     <div class="card-body">
         <!-- Filters -->
-        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <a href="?filter=all" class="btn btn-sm <?php echo $filter === 'all' ? 'btn-primary' : ''; ?>" style="<?php echo $filter !== 'all' ? 'background: var(--bg-light);' : ''; ?>">الكل</a>
-            <a href="?filter=pending" class="btn btn-sm <?php echo $filter === 'pending' ? 'btn-warning' : ''; ?>" style="<?php echo $filter !== 'pending' ? 'background: var(--bg-light);' : ''; ?>">قيد الانتظار</a>
-            <a href="?filter=approved" class="btn btn-sm <?php echo $filter === 'approved' ? 'btn-success' : ''; ?>" style="<?php echo $filter !== 'approved' ? 'background: var(--bg-light);' : ''; ?>">معتمد</a>
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="?filter=all" class="btn btn-sm <?php echo $filter === 'all' ? 'btn-primary' : ''; ?>" style="<?php echo $filter !== 'all' ? 'background: var(--bg-light);' : ''; ?>">
+                <i class="fas fa-list"></i> الكل
+            </a>
+            <a href="?filter=pending" class="btn btn-sm <?php echo $filter === 'pending' ? 'btn-warning' : ''; ?>" style="<?php echo $filter !== 'pending' ? 'background: var(--bg-light);' : ''; ?>">
+                <i class="fas fa-clock"></i> قيد الانتظار
+            </a>
+            <a href="?filter=approved" class="btn btn-sm <?php echo $filter === 'approved' ? 'btn-success' : ''; ?>" style="<?php echo $filter !== 'approved' ? 'background: var(--bg-light);' : ''; ?>">
+                <i class="fas fa-check"></i> معتمد
+            </a>
+            <a href="?filter=website" class="btn btn-sm <?php echo $filter === 'website' ? 'btn-info' : ''; ?>" style="<?php echo $filter !== 'website' ? 'background: var(--bg-light);' : ''; ?>position: relative;">
+                <i class="fas fa-globe"></i> من الموقع
+                <?php if ($pending_website_count > 0): ?>
+                <span style="position: absolute; top: -8px; left: -8px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">
+                    <?php echo $pending_website_count; ?>
+                </span>
+                <?php endif; ?>
+            </a>
+            <a href="?filter=google" class="btn btn-sm <?php echo $filter === 'google' ? 'btn-success' : ''; ?>" style="<?php echo $filter !== 'google' ? 'background: var(--bg-light);' : ''; ?>">
+                <i class="fab fa-google"></i> Google
+            </a>
         </div>
 
         <?php if (count($reviews) > 0): ?>
@@ -77,6 +101,7 @@ $reviews = $stmt->fetchAll();
                     <tr>
                         <th>#</th>
                         <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
                         <th>التقييم</th>
                         <th>المراجعة</th>
                         <th>المصدر</th>
@@ -91,6 +116,15 @@ $reviews = $stmt->fetchAll();
                         <td><?php echo $review['id']; ?></td>
                         <td><?php echo htmlspecialchars($review['client_name']); ?></td>
                         <td>
+                            <?php if (!empty($review['client_email'])): ?>
+                                <a href="mailto:<?php echo htmlspecialchars($review['client_email']); ?>" style="color: #0ea5e9;">
+                                    <?php echo htmlspecialchars($review['client_email']); ?>
+                                </a>
+                            <?php else: ?>
+                                <span style="color: #9ca3af;">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <i class="fas fa-star" style="color: <?php echo $i <= $review['rating'] ? '#fbbf24' : '#ddd'; ?>;"></i>
                             <?php endfor; ?>
@@ -98,9 +132,11 @@ $reviews = $stmt->fetchAll();
                         <td style="max-width: 300px;"><?php echo htmlspecialchars($review['review_text']); ?></td>
                         <td>
                             <?php if ($review['source'] === 'email'): ?>
-                            <span class="badge badge-info">بريد إلكتروني</span>
+                            <span class="badge badge-info"><i class="fas fa-globe"></i> موقع</span>
+                            <?php elseif ($review['source'] === 'google'): ?>
+                            <span class="badge badge-success"><i class="fab fa-google"></i> Google</span>
                             <?php else: ?>
-                            <span class="badge badge-primary">يدوي</span>
+                            <span class="badge badge-primary"><i class="fas fa-edit"></i> يدوي</span>
                             <?php endif; ?>
                         </td>
                         <td><?php echo formatDate($review['created_at']); ?></td>

@@ -1009,8 +1009,9 @@ $social_youtube = getSetting('social_youtube', '');
                 <p class="modern-section-subtitle">تجارب حقيقية من عملاء سعداء بخدماتنا</p>
             </div>
 
-            <!-- Google Review Button -->
-            <div style="text-align: center; margin-bottom: 40px;">
+            <!-- Review Buttons -->
+            <div style="text-align: center; margin-bottom: 40px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <!-- Google Review Button -->
                 <a href="<?php echo htmlspecialchars(getSetting('google_review_url', 'https://g.page/r/CTFqEnDtDuxAEAE/review')); ?>"
                    target="_blank"
                    class="google-review-btn"
@@ -1018,6 +1019,15 @@ $social_youtube = getSetting('social_youtube', '');
                     <i class="fab fa-google" style="font-size: 1.5rem;"></i>
                     <span>قيمنا على Google</span>
                     <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">★ 4.8</span>
+                </a>
+
+                <!-- Website Review Button -->
+                <a href="submit-review.php"
+                   class="website-review-btn"
+                   style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 32px; background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3); transition: all 0.3s ease;">
+                    <i class="fas fa-star" style="font-size: 1.5rem;"></i>
+                    <span>قيمنا على الموقع</span>
+                    <i class="fas fa-arrow-left" style="font-size: 0.9rem;"></i>
                 </a>
             </div>
 

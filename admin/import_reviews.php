@@ -5,6 +5,119 @@ include 'includes/header.php';
 // Database connection alias (config.php uses $conn)
 $pdo = $conn;
 
+// Handle JSON file upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['json_file'])) {
+    if ($_FILES['json_file']['error'] === UPLOAD_ERR_OK) {
+        $json_content = file_get_contents($_FILES['json_file']['tmp_name']);
+        $imported = 0;
+        $skipped = 0;
+
+        try {
+            $data = json_decode($json_content, true);
+
+            if (!is_array($data)) {
+                throw new Exception('ملف JSON غير صحيح');
+            }
+
+            // Handle different JSON formats (Apify, Outscraper, etc.)
+            foreach ($data as $item) {
+                // Apify format
+                if (isset($item['reviews'])) {
+                    foreach ($item['reviews'] as $review) {
+                        $rating = $review['stars'] ?? $review['rating'] ?? 0;
+
+                        if ($rating < 3) {
+                            $skipped++;
+                            continue;
+                        }
+
+                        $review_id = $review['reviewId'] ?? $review['time'] ?? md5($review['name'] . $review['text']);
+
+                        $stmt = $pdo->prepare("SELECT id FROM reviews WHERE google_review_id = ?");
+                        $stmt->execute([$review_id]);
+
+                        if ($stmt->fetch()) {
+                            $skipped++;
+                            continue;
+                        }
+
+                        $stmt = $pdo->prepare("
+                            INSERT INTO reviews (
+                                client_name, rating, review_text, source,
+                                is_approved, is_displayed, google_review_id, google_author_photo,
+                                created_at
+                            ) VALUES (?, ?, ?, 'google', 1, 1, ?, ?, ?)
+                        ");
+
+                        $text = !empty($review['text']) ? $review['text'] : 'تقييم ممتاز';
+                        $photo = $review['reviewerPhotoUrl'] ?? $review['profile_photo_url'] ?? '';
+                        $created = isset($review['publishedAtDate']) ? date('Y-m-d H:i:s', strtotime($review['publishedAtDate'])) :
+                                   (isset($review['time']) ? date('Y-m-d H:i:s', $review['time']) : date('Y-m-d H:i:s'));
+
+                        if ($stmt->execute([
+                            $review['name'] ?? $review['author_name'] ?? 'غير معروف',
+                            $rating,
+                            $text,
+                            $review_id,
+                            $photo,
+                            $created
+                        ])) {
+                            $imported++;
+                        }
+                    }
+                }
+                // Direct format (array of reviews)
+                elseif (isset($item['author_name']) || isset($item['name'])) {
+                    $rating = $item['rating'] ?? $item['stars'] ?? 0;
+
+                    if ($rating < 3) {
+                        $skipped++;
+                        continue;
+                    }
+
+                    $review_id = $item['time'] ?? md5(($item['author_name'] ?? $item['name']) . $item['text']);
+
+                    $stmt = $pdo->prepare("SELECT id FROM reviews WHERE google_review_id = ?");
+                    $stmt->execute([$review_id]);
+
+                    if ($stmt->fetch()) {
+                        $skipped++;
+                        continue;
+                    }
+
+                    $stmt = $pdo->prepare("
+                        INSERT INTO reviews (
+                            client_name, rating, review_text, source,
+                            is_approved, is_displayed, google_review_id, google_author_photo,
+                            created_at
+                        ) VALUES (?, ?, ?, 'google', 1, 1, ?, ?, ?)
+                    ");
+
+                    $text = !empty($item['text']) ? $item['text'] : 'تقييم ممتاز';
+                    $photo = $item['profile_photo_url'] ?? '';
+                    $created = isset($item['time']) ? date('Y-m-d H:i:s', $item['time']) : date('Y-m-d H:i:s');
+
+                    if ($stmt->execute([
+                        $item['author_name'] ?? $item['name'] ?? 'غير معروف',
+                        $rating,
+                        $text,
+                        $review_id,
+                        $photo,
+                        $created
+                    ])) {
+                        $imported++;
+                    }
+                }
+            }
+
+            $success_message = "✅ تم استيراد {$imported} تقييم من الملف بنجاح!" . ($skipped > 0 ? " (تم تخطي {$skipped})" : "");
+
+        } catch (Exception $e) {
+            $error_message = 'خطأ في استيراد الملف: ' . $e->getMessage();
+        }
+    }
+}
+
 // Handle JSON import
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['import_json'])) {
     $json_data = $_POST['json_data'];
@@ -379,6 +492,78 @@ document.getElementById('apifyForm').addEventListener('submit', function(e) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري جلب التقييمات... انتظر 1-2 دقيقة';
     btn.style.background = '#6b7280';
+});
+</script>
+
+<!-- JSON File Upload -->
+<div class="card" style="margin-bottom: 30px; border: 3px solid #f59e0b;">
+    <div class="card-header" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+        <h2 style="color: white; margin: 0;"><i class="fas fa-file-upload"></i> رفع ملف JSON (للملف اللي عندك) 📁</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert" style="background: #fffbeb; border-left: 4px solid #f59e0b; margin-bottom: 20px;">
+            <strong style="color: #d97706; font-size: 1.2rem;">📄 عندك ملف dataset_Google-Maps-Reviews-Scraper*.json؟</strong><br>
+            <p style="margin: 10px 0; color: #92400e; line-height: 1.8;">
+                ارفع الملف هنا مباشرة وسيتم استيراد جميع التقييمات تلقائياً!<br>
+                يدعم ملفات Apify و Outscraper و أي ملف JSON للتقييمات.
+            </p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="jsonFileForm">
+            <div style="text-align: center; padding: 30px; background: white; border-radius: 12px; border: 2px dashed #f59e0b;">
+                <div style="margin-bottom: 20px;">
+                    <i class="fas fa-file-code" style="font-size: 3rem; color: #f59e0b; margin-bottom: 15px;"></i>
+                    <h3 style="color: #374151; margin: 10px 0;">ارفع ملف JSON</h3>
+                    <p style="color: #6b7280;">اختر ملف dataset_Google-Maps-Reviews-Scraper*.json من جهازك</p>
+                </div>
+
+                <div class="form-group">
+                    <input type="file" name="json_file" id="jsonFileInput" accept=".json" required
+                           style="display: none;">
+                    <button type="button" onclick="document.getElementById('jsonFileInput').click()"
+                            class="btn btn-warning" style="padding: 15px 40px; font-size: 1.1rem;">
+                        <i class="fas fa-folder-open"></i> اختيار ملف JSON
+                    </button>
+                </div>
+
+                <div id="selectedFile" style="margin-top: 15px; display: none;">
+                    <p style="color: #10b981; font-weight: bold;">
+                        <i class="fas fa-check-circle"></i> <span id="fileName"></span>
+                    </p>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg" id="uploadBtn"
+                        style="margin-top: 20px; display: none; font-size: 1.2rem; padding: 15px 40px;">
+                    <i class="fas fa-upload"></i> استيراد التقييمات من الملف
+                </button>
+            </div>
+        </form>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <strong style="color: #0284c7;">💡 تنسيقات مدعومة:</strong>
+            <ul style="margin: 10px 0; color: #075985;">
+                <li>✅ Apify dataset format</li>
+                <li>✅ Outscraper JSON format</li>
+                <li>✅ Google Maps Reviews JSON</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('jsonFileInput').addEventListener('change', function(e) {
+    if (this.files.length > 0) {
+        const file = this.files[0];
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('selectedFile').style.display = 'block';
+        document.getElementById('uploadBtn').style.display = 'inline-block';
+    }
+});
+
+document.getElementById('jsonFileForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('uploadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاستيراد...';
 });
 </script>
 
