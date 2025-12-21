@@ -34,6 +34,16 @@ $contact_address = getSetting('contact_address', '');
 $working_hours = getSetting('working_hours', '');
 $site_favicon = getSetting('site_favicon', '');
 
+$doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً في مجال طب الأسنان');
+$site_phone = getSetting('site_phone', '+20 123 456 7890');
+$site_email = getSetting('site_email', 'info@example.com');
+$site_address = getSetting('site_address', 'القاهرة، مصر');
+
+// Page title for header
+$page_title = 'عن الدكتور';
+$page_description = 'تعرف على فريقنا الطبي المتميز وخبراتنا في مجال طب الأسنان';
+
+
 // Fetch specialties
 try {
     $stmt = $conn->prepare("SELECT * FROM specialties WHERE is_active = 1 ORDER BY display_order ASC LIMIT 6");
@@ -49,19 +59,10 @@ $years_experience = getSetting('years_experience', '15+');
 $success_rate = getSetting('success_rate', '98%');
 $awards_count = getSetting('awards_count', '25+');
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عن الدكتور - <?php echo htmlspecialchars($site_name); ?></title>
+?>
+<?php include 'includes/header.php'; ?>
 
-    <?php if ($site_favicon): ?>
-    <link rel="icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo UPLOAD_URL . htmlspecialchars($site_favicon); ?>">
-    <?php endif; ?>
-
-    <!-- Fonts -->
+    <style>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -383,60 +384,7 @@ $awards_count = getSetting('awards_count', '25+');
             }
         }
     </style>
-</head>
-<body>
     <!-- Modern Navbar -->
-    <nav class="modern-navbar">
-        <div class="container">
-            <div class="modern-nav-content">
-                <a href="index.php" class="modern-logo">
-                    <?php if ($site_logo): ?>
-                        <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>">
-                    <?php else: ?>
-                        <i class="fas fa-tooth"></i>
-                        <span><?php echo htmlspecialchars($site_name); ?></span>
-                    <?php endif; ?>
-                </a>
-
-                <ul class="modern-nav-menu" id="modernNavMenu">
-                    <li><a href="index.php">الرئيسية</a></li>
-                    <li><a href="about.php" class="active">عن الدكتور</a></li>
-                    <li><a href="services.php">الخدمات</a></li>
-                    <li><a href="doctors.php">الأطباء</a></li>
-                    <?php if (count($header_menu) > 0): ?>
-                        <?php foreach ($header_menu as $item): ?>
-                            <li><a href="<?php echo htmlspecialchars($item['url']); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </ul>
-
-                <div class="modern-nav-actions">
-                    <a href="index.php#booking" class="modern-booking-btn">
-                        <i class="fas fa-calendar-check"></i>
-                        احجز الآن
-                    </a>
-
-                    <div class="modern-social-icons">
-                        <?php if ($social_facebook): ?>
-                            <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_instagram): ?>
-                            <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_twitter): ?>
-                            <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="modern-hamburger" id="modernHamburger">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
 
     <!-- Hero Section -->
     <section class="about-hero">
@@ -637,116 +585,4 @@ $awards_count = getSetting('awards_count', '25+');
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="modern-footer">
-        <div class="container">
-            <div class="footer-content">
-                <!-- Column 1: Logo & Social -->
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <?php if ($site_logo): ?>
-                            <img src="<?php echo UPLOAD_URL . htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" style="max-width: 180px;">
-                        <?php else: ?>
-                            <i class="fas fa-tooth"></i>
-                            <span><?php echo htmlspecialchars($site_name); ?></span>
-                        <?php endif; ?>
-                    </div>
-                    <p class="footer-desc">نقدم أفضل خدمات طب الأسنان بأحدث التقنيات العالمية</p>
-                    <div class="footer-social">
-                        <?php if ($social_facebook): ?>
-                            <a href="<?php echo htmlspecialchars($social_facebook); ?>" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_twitter): ?>
-                            <a href="<?php echo htmlspecialchars($social_twitter); ?>" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_instagram): ?>
-                            <a href="<?php echo htmlspecialchars($social_instagram); ?>" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_youtube): ?>
-                            <a href="<?php echo htmlspecialchars($social_youtube); ?>" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <?php endif; ?>
-                        <?php if ($social_linkedin): ?>
-                            <a href="<?php echo htmlspecialchars($social_linkedin); ?>" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Column 2: Quick Links -->
-                <div class="footer-section">
-                    <h3 class="footer-title">روابط سريعة</h3>
-                    <ul class="footer-links">
-                        <li><a href="index.php">الرئيسية</a></li>
-                        <li><a href="about.php">عن الدكتور</a></li>
-                        <li><a href="services.php">الخدمات</a></li>
-                        <li><a href="doctors.php">الأطباء</a></li>
-                        <li><a href="index.php#booking">احجز الآن</a></li>
-                    </ul>
-                </div>
-
-                <!-- Column 3: Contact Info -->
-                <div class="footer-section">
-                    <h3 class="footer-title">تواصل معنا</h3>
-                    <ul class="footer-contact">
-                        <?php if ($contact_phone): ?>
-                            <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($contact_phone); ?></li>
-                        <?php endif; ?>
-                        <?php if ($contact_email): ?>
-                            <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($contact_email); ?></li>
-                        <?php endif; ?>
-                        <?php if ($contact_address): ?>
-                            <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($contact_address); ?></li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-
-                <!-- Column 4: Working Hours -->
-                <div class="footer-section">
-                    <h3 class="footer-title">ساعات العمل</h3>
-                    <?php if ($working_hours): ?>
-                        <p class="footer-hours"><?php echo nl2br(htmlspecialchars($working_hours)); ?></p>
-                    <?php else: ?>
-                        <p class="footer-hours">
-                            السبت - الخميس: 9 صباحاً - 9 مساءً<br>
-                            الجمعة: مغلق
-                        </p>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Mobile menu toggle
-        const hamburger = document.getElementById('modernHamburger');
-        const navMenu = document.getElementById('modernNavMenu');
-
-        if (hamburger && navMenu) {
-            hamburger.addEventListener('click', function() {
-                this.classList.toggle('active');
-                navMenu.classList.toggle('active');
-            });
-        }
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-                if (href !== '#' && href.length > 1) {
-                    const target = document.querySelector(href);
-                    if (target) {
-                        e.preventDefault();
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

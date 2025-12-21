@@ -15,6 +15,19 @@ $site_name = getSetting('site_name', 'عيادة الدكتور');
 $site_phone = getSetting('site_phone', '+20 123 456 7890');
 $site_email = getSetting('site_email', 'info@example.com');
 
+$site_logo = getSetting('site_logo', '');
+$social_facebook = getSetting('social_facebook', '');
+$social_instagram = getSetting('social_instagram', '');
+$social_twitter = getSetting('social_twitter', '');
+$social_youtube = getSetting('social_youtube', '');
+$doctor_bio = getSetting('doctor_bio', 'خبرة تمتد لأكثر من 15 عاماً في مجال طب الأسنان');
+$site_address = getSetting('site_address', 'القاهرة، مصر');
+
+// Page title for header
+$page_title = 'الباقات والأسعار';
+$page_description = 'تعرف على باقاتنا وأسعارنا المميزة لخدمات طب الأسنان';
+
+
 // Fetch menu items
 try {
     $stmt = $conn->prepare("SELECT * FROM menu_items WHERE is_active = 1 AND position = 'header' ORDER BY display_order ASC");
@@ -32,19 +45,10 @@ try {
     $footer_menu = [];
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الباقات والأسعار - <?php echo htmlspecialchars($site_name); ?></title>
-    <meta name="description" content="تعرف على باقاتنا وأسعارنا المميزة لخدمات طب الأسنان">
+?>
+<?php include 'includes/header.php'; ?>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/main.css">
@@ -301,10 +305,7 @@ try {
             }
         }
     </style>
-</head>
-<body>
     <!-- Include Header -->
-    <?php include 'includes/header.php'; ?>
 
     <!-- Page Header -->
     <section class="page-header-section">
@@ -396,18 +397,5 @@ try {
     </section>
 
     <!-- Include Footer -->
-    <?php include 'includes/footer.php'; ?>
 
-    <script>
-        // Smooth scroll for booking links
-        document.querySelectorAll('a[href*="#booking"]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (this.getAttribute('href').includes('#booking')) {
-                    e.preventDefault();
-                    window.location.href = 'index.php#booking';
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>
