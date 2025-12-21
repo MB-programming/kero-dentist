@@ -123,6 +123,138 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     }
 }
 
+// Handle Apify API fetch
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fetch_apify'])) {
+    $apify_api_key = getSetting('apify_api_key', '');
+    $google_place_id = getSetting('google_place_id', 'CTFqEnDtDuxAEAE');
+
+    if (!empty($apify_api_key)) {
+        try {
+            $actor_id = 'compass/google-maps-reviews-scraper';
+            $run_url = "https://api.apify.com/v2/acts/{$actor_id}/runs?token={$apify_api_key}";
+
+            $input = [
+                'startUrls' => [
+                    ['url' => "https://www.google.com/maps/place/?q=place_id:{$google_place_id}"]
+                ],
+                'maxReviews' => 150,
+                'language' => 'ar',
+                'sortBy' => 'newest'
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $run_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($input));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($http_code === 201) {
+                $run_data = json_decode($response, true);
+                $run_id = $run_data['data']['id'];
+                $dataset_id = $run_data['data']['defaultDatasetId'];
+
+                $fetch_message = "تم بدء جلب التقييمات من Apify... انتظر 1-2 دقيقة ثم حدّث الصفحة.";
+
+                // Wait for completion (polling)
+                $max_wait = 120;
+                $wait_interval = 5;
+                $waited = 0;
+                $status = 'RUNNING';
+
+                while ($waited < $max_wait && $status === 'RUNNING') {
+                    sleep($wait_interval);
+                    $waited += $wait_interval;
+
+                    $status_url = "https://api.apify.com/v2/acts/{$actor_id}/runs/{$run_id}?token={$apify_api_key}";
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $status_url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $status_response = curl_exec($ch);
+                    curl_close($ch);
+
+                    $status_data = json_decode($status_response, true);
+                    $status = $status_data['data']['status'] ?? 'RUNNING';
+                }
+
+                if ($status === 'SUCCEEDED') {
+                    $dataset_url = "https://api.apify.com/v2/datasets/{$dataset_id}/items?token={$apify_api_key}";
+
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $dataset_url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $results = curl_exec($ch);
+                    curl_close($ch);
+
+                    $reviews = json_decode($results, true);
+                    $imported = 0;
+                    $skipped = 0;
+
+                    foreach ($reviews as $item) {
+                        if (isset($item['reviews'])) {
+                            foreach ($item['reviews'] as $review) {
+                                $rating = $review['stars'] ?? 0;
+
+                                if ($rating < 3) {
+                                    $skipped++;
+                                    continue;
+                                }
+
+                                $review_id = $review['reviewId'] ?? md5($review['name'] . $review['text']);
+
+                                $stmt = $pdo->prepare("SELECT id FROM reviews WHERE google_review_id = ?");
+                                $stmt->execute([$review_id]);
+
+                                if ($stmt->fetch()) {
+                                    $skipped++;
+                                    continue;
+                                }
+
+                                $stmt = $pdo->prepare("
+                                    INSERT INTO reviews (
+                                        client_name, rating, review_text, source,
+                                        is_approved, is_displayed, google_review_id, google_author_photo,
+                                        created_at
+                                    ) VALUES (?, ?, ?, 'google', 1, 1, ?, ?, ?)
+                                ");
+
+                                $text = !empty($review['text']) ? $review['text'] : 'تقييم ممتاز';
+                                $photo = $review['reviewerPhotoUrl'] ?? '';
+                                $created = isset($review['publishedAtDate']) ? date('Y-m-d H:i:s', strtotime($review['publishedAtDate'])) : date('Y-m-d H:i:s');
+
+                                if ($stmt->execute([
+                                    $review['name'],
+                                    $rating,
+                                    $text,
+                                    $review_id,
+                                    $photo,
+                                    $created
+                                ])) {
+                                    $imported++;
+                                }
+                            }
+                        }
+                    }
+
+                    $success_message = "✅ تم استيراد {$imported} تقييم من Apify بنجاح!" . ($skipped > 0 ? " (تم تخطي {$skipped})" : "");
+                } else {
+                    $error_message = "انتهت المهلة. حالة Apify: {$status}. حاول مرة أخرى.";
+                }
+            } else {
+                $error_message = "خطأ في Apify API: HTTP {$http_code}";
+            }
+        } catch (Exception $e) {
+            $error_message = 'خطأ: ' . $e->getMessage();
+        }
+    } else {
+        $error_message = 'يرجى إضافة Apify API Key في الإعدادات أولاً';
+    }
+}
+
 // Get current Google reviews count
 $stmt = $pdo->query("SELECT COUNT(*) FROM reviews WHERE source = 'google'");
 $google_count = $stmt->fetchColumn();
@@ -194,6 +326,58 @@ $google_count = $stmt->fetchColumn();
         </ol>
     </div>
 </div>
+
+<!-- Apify Quick Import -->
+<div class="card" style="margin-bottom: 30px; border: 3px solid #10b981;">
+    <div class="card-header" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+        <h2 style="color: white; margin: 0;"><i class="fas fa-rocket"></i> جلب تلقائي من Apify API (الأسهل! ✅)</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert" style="background: #f0fdf4; border-left: 4px solid #10b981; margin-bottom: 20px;">
+            <strong style="color: #10b981; font-size: 1.2rem;">🎯 الطريقة الأسرع والأسهل!</strong><br>
+            <p style="margin: 10px 0; color: #374151; line-height: 1.8;">
+                API Key الخاص بك جاهز ومضاف مسبقاً!<br>
+                فقط اضغط الزر بالأسفل وانتظر 1-2 دقيقة ← ستظهر جميع الـ 129 تقييم تلقائياً! ✨
+            </p>
+        </div>
+
+        <form method="POST" id="apifyForm">
+            <div style="text-align: center; padding: 30px; background: white; border-radius: 12px; border: 2px dashed #10b981;">
+                <div style="margin-bottom: 20px;">
+                    <i class="fas fa-download" style="font-size: 3rem; color: #10b981; margin-bottom: 15px;"></i>
+                    <h3 style="color: #374151; margin: 10px 0;">جاهز للاستيراد!</h3>
+                    <p style="color: #6b7280;">اضغط الزر لجلب جميع التقييمات من Google Maps</p>
+                </div>
+
+                <button type="submit" name="fetch_apify" class="btn btn-success btn-lg" id="apifyBtn" style="font-size: 1.3rem; padding: 20px 50px;">
+                    <i class="fas fa-cloud-download-alt"></i> جلب التقييمات من Apify الآن
+                </button>
+
+                <p style="margin-top: 20px; color: #6b7280; font-size: 0.9rem;">
+                    ⏱️ سيستغرق 1-2 دقيقة فقط
+                </p>
+            </div>
+        </form>
+
+        <div style="margin-top: 20px; padding: 15px; background: #fffbeb; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <strong style="color: #d97706;">💡 ملاحظة مهمة:</strong>
+            <p style="margin: 5px 0 0; color: #92400e;">
+                • سيتم استيراد فقط التقييمات من 3 إلى 5 نجوم<br>
+                • التقييمات المكررة سيتم تخطيها تلقائياً<br>
+                • يمكنك تشغيل هذا مرة كل شهر لجلب التقييمات الجديدة
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('apifyForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('apifyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري جلب التقييمات... انتظر 1-2 دقيقة';
+    btn.style.background = '#6b7280';
+});
+</script>
 
 <!-- JSON Import -->
 <div class="card" style="margin-bottom: 30px;">

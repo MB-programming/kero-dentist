@@ -379,16 +379,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label><strong>طريقة التحديث التلقائي</strong></label>
                 <select name="review_update_method" class="form-control">
                     <option value="disabled" <?php echo getSetting('review_update_method') === 'disabled' ? 'selected' : ''; ?>>معطّل (يدوي فقط)</option>
-                    <option value="outscraper" <?php echo getSetting('review_update_method') === 'outscraper' ? 'selected' : ''; ?>>Outscraper API (موصى به)</option>
+                    <option value="apify" <?php echo getSetting('review_update_method') === 'apify' ? 'selected' : ''; ?>>Apify API (جاهز للاستخدام! ✅)</option>
+                    <option value="outscraper" <?php echo getSetting('review_update_method') === 'outscraper' ? 'selected' : ''; ?>>Outscraper API</option>
                     <option value="sheets" <?php echo getSetting('review_update_method') === 'sheets' ? 'selected' : ''; ?>>Google Sheets CSV</option>
                 </select>
             </div>
 
             <hr style="margin: 30px 0;">
 
+            <!-- Apify Settings -->
+            <h3 style="color: #10b981; margin-bottom: 15px;">
+                <i class="fas fa-rocket"></i> إعدادات Apify API (جاهز! ✅)
+            </h3>
+
+            <div class="alert" style="background: #f0fdf4; border-left: 4px solid #10b981;">
+                <strong>✅ جاهز للاستخدام الآن!</strong><br>
+                API Key الخاص بك مضاف مسبقاً. فقط اختر "Apify API" من القائمة أعلاه واحفظ!<br>
+                <br>
+                <strong>المميزات:</strong><br>
+                • يجلب جميع الـ 129 تقييم<br>
+                • جودة عالية مع الصور<br>
+                • تحديث تلقائي كل 3 أيام<br>
+                • $5 credit مجاناً (كافي لعدة أشهر)
+            </div>
+
+            <div class="form-group">
+                <label>Apify API Token</label>
+                <input type="text" name="apify_api_key" value="<?php echo htmlspecialchars(getSetting('apify_api_key', '')); ?>" placeholder="apify_api_xxxxxxxxxxxxxxxxx">
+                <small class="form-text">الصق Apify API Token هنا من: <a href="https://console.apify.com/account/integrations" target="_blank">Apify Integrations</a></small>
+            </div>
+
+            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 2px solid #10b981;">
+                <strong style="color: #10b981;">🎯 خطوات سريعة للبدء:</strong>
+                <ol style="margin: 10px 0; color: #374151;">
+                    <li>اختر "Apify API" من القائمة أعلاه</li>
+                    <li>اضغط "حفظ الإعدادات" في الأسفل</li>
+                    <li>اذهب إلى: <a href="import_reviews.php">صفحة الاستيراد</a> واضغط "جلب من Apify"</li>
+                    <li>انتظر 1-2 دقيقة ← ستظهر جميع التقييمات! ✅</li>
+                </ol>
+            </div>
+
+            <hr style="margin: 30px 0;">
+
             <!-- Outscraper Settings -->
             <h3 style="color: #0ea5e9; margin-bottom: 15px;">
-                <i class="fas fa-robot"></i> إعدادات Outscraper API
+                <i class="fas fa-robot"></i> إعدادات Outscraper API (بديل)
             </h3>
 
             <div class="alert" style="background: #e0f2fe; border-left: 4px solid #0ea5e9;">
