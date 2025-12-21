@@ -2,6 +2,9 @@
 $page_title = 'استيراد تقييمات Google بالجملة';
 include 'includes/header.php';
 
+// Database connection alias (config.php uses $conn)
+$pdo = $conn;
+
 // Handle JSON import
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['import_json'])) {
     $json_data = $_POST['json_data'];
