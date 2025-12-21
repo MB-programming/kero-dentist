@@ -37,9 +37,18 @@ try {
     $packages = [];
 }
 
-// Fetch approved reviews
+// Fetch approved reviews (including Google reviews with 3-5 stars only)
 try {
-    $stmt = $conn->prepare("SELECT * FROM reviews WHERE is_approved = 1 AND is_displayed = 1 ORDER BY created_at DESC LIMIT 6");
+    $stmt = $conn->prepare("
+        SELECT * FROM reviews
+        WHERE is_approved = 1
+        AND is_displayed = 1
+        AND rating >= 3
+        ORDER BY
+            CASE WHEN source = 'google' THEN 0 ELSE 1 END,
+            created_at DESC
+        LIMIT 6
+    ");
     $stmt->execute();
     $reviews = $stmt->fetchAll();
 } catch(PDOException $e) {
@@ -425,6 +434,16 @@ $social_youtube = getSetting('social_youtube', '');
             .achievement-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Google Review Button */
+        .google-review-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4) !important;
+        }
+
+        .google-review-btn:active {
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -990,6 +1009,18 @@ $social_youtube = getSetting('social_youtube', '');
                 <p class="modern-section-subtitle">تجارب حقيقية من عملاء سعداء بخدماتنا</p>
             </div>
 
+            <!-- Google Review Button -->
+            <div style="text-align: center; margin-bottom: 40px;">
+                <a href="<?php echo htmlspecialchars(getSetting('google_review_url', 'https://g.page/r/CTFqEnDtDuxAEAE/review')); ?>"
+                   target="_blank"
+                   class="google-review-btn"
+                   style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 32px; background: linear-gradient(135deg, #4285f4, #34a853); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3); transition: all 0.3s ease;">
+                    <i class="fab fa-google" style="font-size: 1.5rem;"></i>
+                    <span>قيمنا على Google</span>
+                    <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">★ 4.8</span>
+                </a>
+            </div>
+
             <?php if (count($reviews) > 0): ?>
             <!-- Reviews Grid -->
             <div class="reviews-grid">
@@ -1000,10 +1031,21 @@ $social_youtube = getSetting('social_youtube', '');
                 <div class="review-card">
                     <div class="review-header">
                         <div class="review-avatar">
-                            <i class="fas fa-user"></i>
+                            <?php if (!empty($review['google_author_photo'])): ?>
+                                <img src="<?php echo htmlspecialchars($review['google_author_photo']); ?>"
+                                     alt="<?php echo htmlspecialchars($review['client_name']); ?>"
+                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            <?php else: ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
                         </div>
                         <div class="review-info">
-                            <h4 class="review-name"><?php echo htmlspecialchars($review['client_name']); ?></h4>
+                            <h4 class="review-name">
+                                <?php echo htmlspecialchars($review['client_name']); ?>
+                                <?php if ($review['source'] === 'google'): ?>
+                                    <i class="fab fa-google" style="color: #4285f4; font-size: 0.9rem; margin-right: 5px;" title="تقييم من Google"></i>
+                                <?php endif; ?>
+                            </h4>
                             <div class="review-rating">
                                 <?php for ($i = 1; $i <= 5; $i++): ?>
                                     <?php if ($i <= $review['rating']): ?>
@@ -1017,8 +1059,13 @@ $social_youtube = getSetting('social_youtube', '');
                     </div>
                     <p class="review-text">"<?php echo htmlspecialchars($review['review_text']); ?>"</p>
                     <div class="review-footer">
-                        <i class="fas fa-check-circle"></i>
-                        <span>عميل معتمد</span>
+                        <?php if ($review['source'] === 'google'): ?>
+                            <i class="fab fa-google" style="color: #4285f4;"></i>
+                            <span>تقييم من Google Maps</span>
+                        <?php else: ?>
+                            <i class="fas fa-check-circle"></i>
+                            <span>عميل معتمد</span>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>

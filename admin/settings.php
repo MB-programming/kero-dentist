@@ -318,6 +318,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Google Maps & Reviews Settings -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fab fa-google"></i> إعدادات Google Maps والتقييمات</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>روابط عيادتك:</strong><br>
+                • رابط التقييم: <a href="https://g.page/r/CTFqEnDtDuxAEAE/review" target="_blank">https://g.page/r/CTFqEnDtDuxAEAE/review</a><br>
+                • الملف التعريفي: <a href="https://maps.app.goo.gl/9TCoYUMWk6kHKwqd8" target="_blank">https://maps.app.goo.gl/9TCoYUMWk6kHKwqd8</a>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Google Place ID</label>
+                    <input type="text" name="google_place_id" value="<?php echo htmlspecialchars(getSetting('google_place_id', 'CTFqEnDtDuxAEAE')); ?>" placeholder="CTFqEnDtDuxAEAE">
+                    <small class="form-text">Place ID الخاص بعيادتك على Google Maps</small>
+                </div>
+                <div class="form-group">
+                    <label>Google Maps API Key (اختياري)</label>
+                    <input type="text" name="google_api_key" value="<?php echo htmlspecialchars(getSetting('google_api_key')); ?>" placeholder="AIza...">
+                    <small class="form-text">للجلب التلقائي للتقييمات من Google</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>رابط التقييم على Google</label>
+                <input type="url" name="google_review_url" value="<?php echo htmlspecialchars(getSetting('google_review_url', 'https://g.page/r/CTFqEnDtDuxAEAE/review')); ?>" placeholder="https://g.page/r/...">
+                <small class="form-text">الرابط المباشر لصفحة التقييم</small>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                <strong>📝 كيفية الحصول على Google API Key:</strong>
+                <ol style="margin: 10px 0;">
+                    <li>اذهب إلى <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                    <li>أنشئ مشروع جديد</li>
+                    <li>فعّل "Places API"</li>
+                    <li>أنشئ API Key من قسم Credentials</li>
+                    <li>انسخ المفتاح والصقه هنا</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
     <!-- SMTP Email Settings -->
     <div class="card">
         <div class="card-header">
