@@ -436,7 +436,8 @@ function approveBookingWhatsApp(booking) {
         body: formData
     }).then(() => {
         // Build WhatsApp approval message
-        const message = `مرحباً ${booking.client_name}،\n\n✅ تم الموافقة على حجزك!\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n💰 السعر: ${booking.package_price} جنيه\n📅 التاريخ: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n✨ نحن سعداء بخدمتك!\nيُرجى الحضور في الموعد المحدد.\n\nمع تحياتنا،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
+        const siteName = <?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>;
+        const message = `مرحباً ${booking.client_name}،\n\n✅ تم الموافقة على حجزك!\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n💰 السعر: ${booking.package_price} جنيه\n📅 التاريخ: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n✨ نحن سعداء بخدمتك!\nيُرجى الحضور في الموعد المحدد.\n\nمع تحياتنا،\n${siteName}`;
 
         // Clean phone number and open WhatsApp
         const cleanNumber = booking.client_whatsapp.replace(/[^0-9]/g, '');
@@ -464,7 +465,8 @@ function rejectBookingWhatsApp(booking) {
         body: formData
     }).then(() => {
         // Build WhatsApp rejection message
-        const message = `مرحباً ${booking.client_name}،\n\n❌ نأسف لإبلاغك بأن حجزك قد تم رفضه.\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n📅 التاريخ المطلوب: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n💡 يمكنك اختيار موعد آخر من خلال موقعنا الإلكتروني.\n\nنعتذر عن الإزعاج،\n${<?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>}`;
+        const siteName = <?php echo json_encode(getSetting('site_name', 'عيادة الأسنان')); ?>;
+        const message = `مرحباً ${booking.client_name}،\n\n❌ نأسف لإبلاغك بأن حجزك قد تم رفضه.\n\n📋 تفاصيل الحجز:\n━━━━━━━━━━━━━━━━\n📦 الباقة: ${booking.package_name}\n📅 التاريخ المطلوب: ${booking.booking_date}\n${booking.booking_time ? '🕐 الوقت: ' + booking.booking_time + '\n' : ''}📆 اليوم: ${booking.booking_day}\n\n💡 يمكنك اختيار موعد آخر من خلال موقعنا الإلكتروني.\n\nنعتذر عن الإزعاج،\n${siteName}`;
 
         // Clean phone number and open WhatsApp
         const cleanNumber = booking.client_whatsapp.replace(/[^0-9]/g, '');

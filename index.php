@@ -970,6 +970,14 @@ $social_youtube = getSetting('social_youtube', '');
                 </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php if (count($packages) > 6): ?>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="packages.php" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-box"></i> عرض جميع الباقات
+                </a>
+            </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -1187,11 +1195,13 @@ $social_youtube = getSetting('social_youtube', '');
                 <?php endif; ?>
             </div>
 
+            <?php if (count($blog_posts) > 6): ?>
             <div style="text-align: center; margin-top: 40px;">
                 <a href="blog.php" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-block;">
-                    <i class="fas fa-newspaper"></i> مشاهدة جميع المقالات
+                    <i class="fas fa-newspaper"></i> عرض جميع المقالات
                 </a>
             </div>
+            <?php endif; ?>
         </div>
     </section>
     <?php endif; ?>
