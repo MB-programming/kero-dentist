@@ -2,6 +2,9 @@
 $page_title = 'تقييمات Google';
 include 'includes/header.php';
 
+// Database connection alias (config.php uses $conn)
+$pdo = $conn;
+
 // Get Google settings
 $google_place_id = getSetting('google_place_id', '');
 $google_api_key = getSetting('google_api_key', '');

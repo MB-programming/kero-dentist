@@ -10,6 +10,9 @@
 
 require_once __DIR__ . '/../includes/config.php';
 
+// Database connection alias (config.php uses $conn)
+$pdo = $conn;
+
 // Log file
 $log_file = __DIR__ . '/reviews_update.log';
 
