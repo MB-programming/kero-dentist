@@ -37,7 +37,7 @@ if (isset($_FILES['media_files']) && !empty($_FILES['media_files']['name'][0])) 
 // Handle file deletion
 if (isset($_GET['delete'])) {
     $file_path = sanitize($_GET['delete']);
-    $full_path = UPLOAD_DIR . '/' . $file_path;
+    $full_path = UPLOAD_DIR . '/media/' . $file_path;
 
     if (file_exists($full_path) && unlink($full_path)) {
         $success_message = 'تم حذف الملف بنجاح';
@@ -50,7 +50,7 @@ if (isset($_GET['delete'])) {
 
 // Get all media files
 $media_files = [];
-$upload_dir = UPLOAD_DIR;
+$upload_dir = UPLOAD_DIR . '/media';
 
 if (is_dir($upload_dir)) {
     $scan = scandir($upload_dir);
@@ -59,7 +59,7 @@ if (is_dir($upload_dir)) {
             $file_info = [
                 'name' => $file,
                 'path' => $file,
-                'url' => UPLOAD_URL . $file,
+                'url' => UPLOAD_URL . 'media/' . $file,
                 'size' => filesize($upload_dir . '/' . $file),
                 'modified' => filemtime($upload_dir . '/' . $file),
                 'extension' => strtolower(pathinfo($file, PATHINFO_EXTENSION))
